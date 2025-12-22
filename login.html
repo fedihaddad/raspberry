@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Administration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .toggle-btn:hover {
+            opacity: 1;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #1e40af;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 32px 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">🔐</div>
+            <h1>Administration</h1>
+            <p class="subtitle">Collège Ibn Khaldoun</p>
+        </div>
+
+        <div id="error-message" class="error-message">
+            ⚠️ Mot de passe incorrect
+        </div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" placeholder="Entrez votre nom d'utilisateur" required
+                    autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <div class="password-toggle">
+                    <input type="password" id="password" placeholder="Entrez votre mot de passe" required
+                        autocomplete="current-password">
+                    <button type="button" class="toggle-btn" onclick="togglePassword()">👁️</button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                🔓 Se Connecter
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Default credentials (CHANGE THESE!)
+        const CREDENTIALS = {
+            username: 'admin',
+            password: 'admin123'
+        };
+
+        // Check if already logged in
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'add.html';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
+                // Login successful
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('loginTime', new Date().toISOString());
+
+                // Redirect to admin panel
+                window.location.href = 'add.html';
+            } else {
+                // Login failed
+                errorMessage.style.display = 'block';
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000);
+            }
+        });
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        // Auto-focus username field
+        document.getElementById('username').focus();
+    </script>
+</body>
+
+</html>

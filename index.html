@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
+
 <head>
     <meta charset="UTF-8">
-    <title>Smart School Screen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Écran d'Annonces - Collège EL JEM</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 </head>
-<body>
 
+<body>
     <!-- TOP BAR -->
     <div class="top-bar">
-        <div class="school-name">College Ibn Khaldoun</div>
+        <div class="school-info">
+            <div class="school-name">🎓 Collège EL JEM</div>
+            <div class="school-subtitle">Tableau d'Annonces</div>
+        </div>
         <div class="datetime">
             <div id="time"></div>
             <div id="date"></div>
@@ -18,13 +25,27 @@
 
     <!-- MAIN CONTENT -->
     <div class="content">
-        <h1>Announcements</h1>
+        <div class="announcements-header">
+            <h1>📢 Annonces du Jour</h1>
+        </div>
 
-        <div class="card blue">Math Exam – Room B12</div>
-        <div class="card green">Physics Practical – Lab 2</div>
-        <div class="card red">Holiday – Friday</div>
+        <div id="announcements-container" class="announcements-grid">
+            <!-- Announcements will be dynamically loaded here -->
+        </div>
+
+        <div id="no-announcements" class="no-announcements" style="display: none;">
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h2>Aucune annonce pour le moment</h2>
+                <p>Les nouvelles annonces apparaîtront ici automatiquement</p>
+            </div>
+        </div>
     </div>
+
+    <!-- ADMIN ACCESS BUTTON (Hidden, click bottom-right corner 3 times) -->
+    <div id="admin-trigger" class="admin-trigger"></div>
 
     <script src="script.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Initialiser Données de Démonstration</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .success {
+            background: #10b981;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .links {
+            margin-top: 30px;
+        }
+
+        .links a {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 30px;
+            background: #f3f4f6;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .links a:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎓 Système d'Annonces</h1>
+        <h2>Collège Ibn Khaldoun</h2>
+
+        <p>
+            Cliquez sur le bouton ci-dessous pour charger des annonces de démonstration
+            et voir le système en action immédiatement!
+        </p>
+
+        <button onclick="loadDemoData()">
+            ✨ Charger les Données de Démonstration
+        </button>
+
+        <button onclick="clearData()" style="background: #ef4444;">
+            🗑️ Effacer Toutes les Annonces
+        </button>
+
+        <div id="success" class="success">
+            ✅ Données chargées avec succès! Vous pouvez maintenant voir les annonces.
+        </div>
+
+        <div class="links">
+            <a href="index.html">📺 Voir l'Écran d'Affichage</a>
+            <a href="add.html">➕ Ajouter une Annonce</a>
+        </div>
+    </div>
+
+    <script>
+        function loadDemoData() {
+            const demoAnnouncements = [
+                {
+                    type: 'absent',
+                    professeur: 'M. Alami',
+                    matiere: 'Mathématiques',
+                    startDate: '2025-12-22',
+                    endDate: '2025-12-24',
+                    period: 'Du 22 décembre au 24 décembre (3 jours)',
+                    classes: '1ère A, 1ère B, 2ème C',
+                    notes: 'Remplacé par Mme. Bennani',
+                    timestamp: new Date().toISOString()
+                },
+                {
+                    type: 'devoir',
+                    devoirType: 'Examen',
+                    matiere: 'Physique-Chimie',
+                    class: '3ème A',
+                    salle: 'B12',
+                    date: '2025-12-23',
+                    startTime: '08:00',
+                    endTime: '10:00',
+                    duration: '2h',
+                    notes: 'Apporter calculatrice scientifique',
+                    timestamp: new Date(Date.now() - 3600000).toISOString()
+                },
+                {
+                    type: 'devoir',
+                    devoirType: 'Contrôle',
+                    matiere: 'Français',
+                    class: '2ème B',
+                    salle: 'A05',
+                    date: '2025-12-23',
+                    startTime: '10:30',
+                    endTime: '11:30',
+                    duration: '1h',
+                    notes: '',
+                    timestamp: new Date(Date.now() - 7200000).toISOString()
+                },
+                {
+                    type: 'other',
+                    title: 'Réunion Parents-Professeurs',
+                    category: 'event',
+                    description: 'Réunion trimestrielle pour discuter des résultats scolaires et du comportement des élèves. Présence obligatoire.',
+                    date: '2025-12-25',
+                    time: '14:00',
+                    location: 'Amphithéâtre Principal',
+                    timestamp: new Date(Date.now() - 10800000).toISOString()
+                },
+                {
+                    type: 'other',
+                    title: 'Vacances d\'Hiver',
+                    category: 'holiday',
+                    description: 'Les vacances d\'hiver débutent le vendredi 27 décembre. Reprise des cours le lundi 6 janvier 2026.',
+                    date: '2025-12-27',
+                    time: '',
+                    location: '',
+                    timestamp: new Date(Date.now() - 14400000).toISOString()
+                },
+                {
+                    type: 'other',
+                    title: 'Inscription Club Robotique',
+                    category: 'activity',
+                    description: 'Les inscriptions pour le club de robotique sont ouvertes. Places limitées à 20 élèves.',
+                    date: '2025-12-23',
+                    time: '12:00',
+                    location: 'Salle Informatique',
+                    timestamp: new Date(Date.now() - 18000000).toISOString()
+                },
+                {
+                    type: 'absent',
+                    professeur: 'Mme. Chakir',
+                    matiere: 'Anglais',
+                    startDate: '2025-12-23',
+                    endDate: '2025-12-23',
+                    period: 'Du 23 décembre au 23 décembre (1 jour)',
+                    classes: 'Toutes les classes',
+                    notes: 'Formation pédagogique',
+                    timestamp: new Date(Date.now() - 21600000).toISOString()
+                },
+                {
+                    type: 'other',
+                    title: 'Rappel: Paiement Cantine',
+                    category: 'reminder',
+                    description: 'Dernier délai pour le paiement de la cantine du mois de janvier: 30 décembre 2025.',
+                    date: '2025-12-30',
+                    time: '',
+                    location: 'Bureau de l\'intendance',
+                    timestamp: new Date(Date.now() - 25200000).toISOString()
+                }
+            ];
+
+            localStorage.setItem('announcements', JSON.stringify(demoAnnouncements));
+
+            document.getElementById('success').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('success').style.display = 'none';
+            }, 5000);
+        }
+
+        function clearData() {
+            if (confirm('Êtes-vous sûr de vouloir effacer toutes les annonces?')) {
+                localStorage.removeItem('announcements');
+                alert('✅ Toutes les annonces ont été effacées');
+            }
+        }
+    </script>
+</body>
+
+</html>

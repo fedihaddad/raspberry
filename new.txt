@@ -1,0 +1,7 @@
+chromium-browser index.html \
+--kiosk \
+--fullscreen \
+--noerrdialogs \
+--disable-infobars \
+--disable-session-crashed-bubble \
+--incognito

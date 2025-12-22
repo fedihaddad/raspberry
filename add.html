@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajouter une Annonce</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <script>
+    // Check authentication
+    if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+
+    // Logout function
+    function logout() {
+      if (confirm('Voulez-vous vraiment vous déconnecter?')) {
+        sessionStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('loginTime');
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
+</head>
+
+<body class="admin-body">
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1>➕ Nouvelle Annonce</h1>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="index.html" class="btn-back">← Retour à l'écran</a>
+        <button onclick="logout()" class="btn-logout">🚪 Déconnexion</button>
+      </div>
+    </div>
+
+    <div class="form-container">
+      <!-- TYPE SELECTOR -->
+      <div class="type-selector">
+        <h2>Type d'Annonce</h2>
+        <div class="type-buttons">
+          <button class="type-btn active" data-type="absent" onclick="selectType('absent')">
+            <span class="type-icon">👨‍🏫</span>
+            <span class="type-label">Professeur Absent</span>
+          </button>
+          <button class="type-btn" data-type="devoir" onclick="selectType('devoir')">
+            <span class="type-icon">📝</span>
+            <span class="type-label">Devoir / Examen</span>
+          </button>
+          <button class="type-btn" data-type="exclusion" onclick="selectType('exclusion')">
+            <span class="type-icon">⚠️</span>
+            <span class="type-label">Exclusion Élève</span>
+          </button>
+          <button class="type-btn" data-type="other" onclick="selectType('other')">
+            <span class="type-icon">📢</span>
+            <span class="type-label">Autre Annonce</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- FORM FOR PROFESSEUR ABSENT -->
+      <form id="form-absent" class="announcement-form active">
+        <h3>Professeur Absent</h3>
+
+        <div class="form-group">
+          <label for="absent-prof">Nom du Professeur *</label>
+          <input type="text" id="absent-prof" placeholder="Ex: M. Alami" required>
+        </div>
+
+        <div class="form-group">
+          <label for="absent-matiere">Matière *</label>
+          <input type="text" id="absent-matiere" placeholder="Ex: Mathématiques" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="absent-start">Date de Début *</label>
+            <input type="date" id="absent-start" required>
+          </div>
+          <div class="form-group">
+            <label for="absent-end">Date de Fin *</label>
+            <input type="date" id="absent-end" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Période Calculée</label>
+          <div class="calculated-period" id="calculated-period">
+            Sélectionnez les dates pour calculer la période
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="absent-classes">Classes Concernées *</label>
+          <input type="text" id="absent-classes" placeholder="Ex: 1ère A, 1ère B, 2ème C" required>
+        </div>
+
+        <div class="form-group">
+          <label for="absent-notes">Notes Supplémentaires</label>
+          <textarea id="absent-notes" rows="3" placeholder="Informations complémentaires..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <span>✓</span> Publier l'Annonce
+        </button>
+      </form>
+
+      <!-- FORM FOR DEVOIR -->
+      <form id="form-devoir" class="announcement-form">
+        <h3>Devoir / Examen</h3>
+
+        <div class="form-group">
+          <label for="devoir-type">Type *</label>
+          <select id="devoir-type" required>
+            <option value="">Sélectionner...</option>
+            <option value="Devoir">Devoir</option>
+            <option value="Examen">Examen</option>
+            <option value="Contrôle">Contrôle</option>
+            <option value="Test">Test</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="devoir-matiere">Matière *</label>
+          <input type="text" id="devoir-matiere" placeholder="Ex: Physique-Chimie" required>
+        </div>
+
+        <div class="form-group">
+          <label for="devoir-class">Classe *</label>
+          <input type="text" id="devoir-class" placeholder="Ex: 3ème A" required>
+        </div>
+
+        <div class="form-group">
+          <label for="devoir-salle">Numéro de Salle *</label>
+          <input type="text" id="devoir-salle" placeholder="Ex: B12" required>
+        </div>
+
+        <div class="form-group">
+          <label for="devoir-date">Date *</label>
+          <input type="date" id="devoir-date" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="devoir-start-time">Heure de Début *</label>
+            <input type="time" id="devoir-start-time" required>
+          </div>
+          <div class="form-group">
+            <label for="devoir-end-time">Heure de Fin *</label>
+            <input type="time" id="devoir-end-time" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Durée Calculée</label>
+          <div class="calculated-period" id="calculated-duration">
+            Sélectionnez les heures pour calculer la durée
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="devoir-notes">Instructions Spéciales</label>
+          <textarea id="devoir-notes" rows="3"
+            placeholder="Ex: Apporter calculatrice, documents autorisés..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <span>✓</span> Publier l'Annonce
+        </button>
+      </form>
+
+      <!-- FORM FOR STUDENT EXCLUSION -->
+      <form id="form-exclusion" class="announcement-form">
+        <h3>Exclusion Élève</h3>
+
+        <div class="form-group">
+          <label for="exclusion-student">Nom de l'Élève *</label>
+          <input type="text" id="exclusion-student" placeholder="Ex: Ahmed Bennani" required>
+        </div>
+
+        <div class="form-group">
+          <label for="exclusion-class">Classe *</label>
+          <input type="text" id="exclusion-class" placeholder="Ex: 2ème B" required>
+        </div>
+
+        <div class="form-group">
+          <label for="exclusion-reason">Motif de l'Exclusion *</label>
+          <textarea id="exclusion-reason" rows="3" placeholder="Décrivez le motif de l'exclusion..."
+            required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="exclusion-type">Type d'Exclusion *</label>
+          <select id="exclusion-type" required onchange="toggleExclusionDates()">
+            <option value="">Sélectionner...</option>
+            <option value="temporary">Temporaire (avec dates)</option>
+            <option value="permanent">Définitive (permanente)</option>
+          </select>
+        </div>
+
+        <div id="exclusion-dates" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="exclusion-start">Date de Début</label>
+              <input type="date" id="exclusion-start">
+            </div>
+            <div class="form-group">
+              <label for="exclusion-end">Date de Fin</label>
+              <input type="date" id="exclusion-end">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Période Calculée</label>
+            <div class="calculated-period" id="calculated-exclusion-period">
+              Sélectionnez les dates pour calculer la période
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="exclusion-notes">Notes Additionnelles</label>
+          <textarea id="exclusion-notes" rows="3" placeholder="Informations complémentaires..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <span>✓</span> Publier l'Annonce
+        </button>
+      </form>
+
+      <!-- FORM FOR OTHER ANNOUNCEMENTS -->
+      <form id="form-other" class="announcement-form">
+        <h3>Autre Annonce</h3>
+
+        <div class="form-group">
+          <label for="other-title">Titre de l'Annonce *</label>
+          <input type="text" id="other-title" placeholder="Ex: Réunion Parents-Professeurs" required>
+        </div>
+
+        <div class="form-group">
+          <label for="other-category">Catégorie *</label>
+          <select id="other-category" required>
+            <option value="">Sélectionner...</option>
+            <option value="info">Information</option>
+            <option value="event">Événement</option>
+            <option value="urgent">Urgent</option>
+            <option value="holiday">Vacances</option>
+            <option value="activity">Activité</option>
+            <option value="reminder">Rappel</option>
+            <option value="director">Message du Directeur</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="other-description">Description *</label>
+          <textarea id="other-description" rows="4" placeholder="Détails de l'annonce..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="other-date">Date (Optionnel)</label>
+          <input type="date" id="other-date">
+        </div>
+
+        <div class="form-group">
+          <label for="other-time">Heure (Optionnel)</label>
+          <input type="time" id="other-time">
+        </div>
+
+        <div class="form-group">
+          <label for="other-location">Lieu (Optionnel)</label>
+          <input type="text" id="other-location" placeholder="Ex: Amphithéâtre, Cour principale...">
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <span>✓</span> Publier l'Annonce
+        </button>
+      </form>
+    </div>
+
+    <!-- MANAGE ANNOUNCEMENTS -->
+    <div class="manage-section">
+      <h2>📋 Gérer les Annonces</h2>
+      <div id="manage-list" class="manage-list">
+        <!-- Existing announcements will be listed here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="form.js"></script>
+</body>
+
+</html>

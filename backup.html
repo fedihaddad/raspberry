@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup & Restore</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 100%;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .section {
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        h2 {
+            color: #334155;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .info {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💾 Backup & Restore</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-count">0</div>
+                <div class="stat-label">Total Annonces</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="last-backup">-</div>
+                <div class="stat-label">Dernier Backup</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="data-size">0 KB</div>
+                <div class="stat-label">Taille Données</div>
+            </div>
+        </div>
+
+        <!-- EXPORT -->
+        <div class="section">
+            <h2>📤 Exporter les Données</h2>
+            <div class="info">
+                Téléchargez vos annonces dans un fichier JSON pour les sauvegarder.
+            </div>
+            <button onclick="exportData()" class="success">
+                💾 Télécharger Backup (JSON)
+            </button>
+            <button onclick="copyToClipboard()">
+                📋 Copier dans le Presse-papier
+            </button>
+        </div>
+
+        <!-- IMPORT -->
+        <div class="section">
+            <h2>📥 Importer les Données</h2>
+            <div class="info">
+                ⚠️ Attention: Cela remplacera toutes les annonces actuelles!
+            </div>
+            <input type="file" id="fileInput" accept=".json">
+            <button onclick="importFromFile()" class="danger">
+                📂 Importer depuis Fichier
+            </button>
+            <br><br>
+            <textarea id="importData" placeholder="Ou collez vos données JSON ici..."></textarea>
+            <button onclick="importFromText()" class="danger">
+                📝 Importer depuis Texte
+            </button>
+        </div>
+
+        <!-- VIEW DATA -->
+        <div class="section">
+            <h2>👁️ Voir les Données</h2>
+            <button onclick="viewData()">🔍 Afficher les Données</button>
+            <textarea id="dataView" readonly style="display:none;"></textarea>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="add.html" style="color: #667eea; text-decoration: none; font-weight: 600;">← Retour au Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        // Update stats on load
+        updateStats();
+
+        function updateStats() {
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            const dataStr = JSON.stringify(announcements);
+            const sizeKB = (new Blob([dataStr]).size / 1024).toFixed(2);
+            
+            document.getElementById('total-count').textContent = announcements.length;
+            document.getElementById('data-size').textContent = sizeKB + ' KB';
+            
+            const lastBackup = localStorage.getItem('lastBackup');
+            if (lastBackup) {
+                const date = new Date(lastBackup);
+                document.getElementById('last-backup').textContent = date.toLocaleDateString('fr-FR');
+            }
+        }
+
+        function exportData() {
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            const dataStr = JSON.stringify(announcements, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const date = new Date().toISOString().split('T')[0];
+            a.href = url;
+            a.download = `announcements-backup-${date}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            localStorage.setItem('lastBackup', new Date().toISOString());
+            updateStats();
+            alert('✅ Backup téléchargé avec succès!');
+        }
+
+        function copyToClipboard() {
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            const dataStr = JSON.stringify(announcements, null, 2);
+            navigator.clipboard.writeText(dataStr).then(() => {
+                alert('✅ Données copiées dans le presse-papier!');
+            });
+        }
+
+        function importFromFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('⚠️ Veuillez sélectionner un fichier!');
+                return;
+            }
+
+            if (!confirm('⚠️ ATTENTION: Cela remplacera toutes les annonces actuelles! Continuer?')) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    localStorage.setItem('announcements', JSON.stringify(data));
+                    updateStats();
+                    alert(`✅ ${data.length} annonce(s) importée(s) avec succès!`);
+                    window.location.reload();
+                } catch (error) {
+                    alert('❌ Erreur: Fichier JSON invalide!');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function importFromText() {
+            const text = document.getElementById('importData').value.trim();
+            
+            if (!text) {
+                alert('⚠️ Veuillez coller des données JSON!');
+                return;
+            }
+
+            if (!confirm('⚠️ ATTENTION: Cela remplacera toutes les annonces actuelles! Continuer?')) {
+                return;
+            }
+
+            try {
+                const data = JSON.parse(text);
+                localStorage.setItem('announcements', JSON.stringify(data));
+                updateStats();
+                alert(`✅ ${data.length} annonce(s) importée(s) avec succès!`);
+                window.location.reload();
+            } catch (error) {
+                alert('❌ Erreur: JSON invalide!');
+            }
+        }
+
+        function viewData() {
+            const dataView = document.getElementById('dataView');
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            dataView.value = JSON.stringify(announcements, null, 2);
+            dataView.style.display = dataView.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

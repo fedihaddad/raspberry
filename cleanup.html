@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nettoyer les Doublons</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🧹 Nettoyer les Doublons</h1>
+
+        <div class="info">
+            <strong>ℹ️ Information</strong>
+            <p>Cet outil vous permet de supprimer les annonces en double dans votre système.</p>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Attention</strong>
+            <p>Cette action supprimera les annonces identiques (même timestamp). Assurez-vous d'avoir une sauvegarde si
+                nécessaire.</p>
+        </div>
+
+        <div style="text-align: center;">
+            <button onclick="checkDuplicates()">🔍 Vérifier les Doublons</button>
+            <button onclick="removeDuplicates()" class="danger">🗑️ Supprimer les Doublons</button>
+            <button onclick="clearAll()" class="danger">⚠️ Tout Effacer</button>
+        </div>
+
+        <div id="result"></div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="add.html" style="color: #667eea; text-decoration: none; font-weight: 600;">← Retour au
+                Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        function checkDuplicates() {
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            const result = document.getElementById('result');
+
+            if (announcements.length === 0) {
+                result.innerHTML = '<p>Aucune annonce trouvée.</p>';
+                result.style.display = 'block';
+                result.className = '';
+                return;
+            }
+
+            // Find duplicates based on timestamp
+            const seen = new Set();
+            const duplicates = [];
+
+            announcements.forEach((ann, index) => {
+                const key = ann.timestamp;
+                if (seen.has(key)) {
+                    duplicates.push(index);
+                } else {
+                    seen.add(key);
+                }
+            });
+
+            if (duplicates.length === 0) {
+                result.innerHTML = `
+                    <p><strong>✅ Aucun doublon détecté!</strong></p>
+                    <p>Total d'annonces: ${announcements.length}</p>
+                `;
+                result.className = 'success';
+            } else {
+                result.innerHTML = `
+                    <p><strong>⚠️ ${duplicates.length} doublon(s) détecté(s)!</strong></p>
+                    <p>Total d'annonces: ${announcements.length}</p>
+                    <p>Annonces uniques: ${announcements.length - duplicates.length}</p>
+                `;
+                result.className = 'warning';
+            }
+
+            result.style.display = 'block';
+        }
+
+        function removeDuplicates() {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer les doublons?')) {
+                return;
+            }
+
+            const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+            const result = document.getElementById('result');
+
+            if (announcements.length === 0) {
+                alert('Aucune annonce à nettoyer.');
+                return;
+            }
+
+            // Remove duplicates based on timestamp
+            const seen = new Set();
+            const unique = [];
+
+            announcements.forEach(ann => {
+                const key = ann.timestamp;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(ann);
+                }
+            });
+
+            const removed = announcements.length - unique.length;
+
+            localStorage.setItem('announcements', JSON.stringify(unique));
+
+            result.innerHTML = `
+                <p><strong>✅ Nettoyage terminé!</strong></p>
+                <p>Doublons supprimés: ${removed}</p>
+                <p>Annonces restantes: ${unique.length}</p>
+            `;
+            result.className = 'success';
+            result.style.display = 'block';
+        }
+
+        function clearAll() {
+            if (!confirm('⚠️ ATTENTION: Cela supprimera TOUTES les annonces! Êtes-vous sûr?')) {
+                return;
+            }
+
+            if (!confirm('Dernière confirmation: Supprimer TOUTES les annonces?')) {
+                return;
+            }
+
+            localStorage.removeItem('announcements');
+
+            const result = document.getElementById('result');
+            result.innerHTML = `
+                <p><strong>✅ Toutes les annonces ont été supprimées!</strong></p>
+            `;
+            result.className = 'success';
+            result.style.display = 'block';
+        }
+
+        // Auto-check on load
+        window.onload = checkDuplicates;
+    </script>
+</body>
+
+</html>
