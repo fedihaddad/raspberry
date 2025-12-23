@@ -326,7 +326,7 @@ exclusionForm?.addEventListener('submit', function (e) {
       period += ` (${diffDays} jours)`;
     }
   } else {
-    period = 'Définitive';
+    period = 'نهائي'; // Changed from 'Définitive' to Arabic
   }
 
   const announcement = {

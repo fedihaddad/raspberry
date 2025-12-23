@@ -83,8 +83,14 @@ function checkFlash(flashAnnouncements) {
     const titleEl = document.getElementById('flash-title-display');
     const messageEl = document.getElementById('flash-message-display');
 
-    if (!overlay || flashAnnouncements.length === 0) {
-        overlay?.classList.remove('active');
+    if (!overlay) return;
+
+    // DEBUG LOGS
+    console.log('--- Checking Flash ---');
+    console.log('Total Flash Announcements:', flashAnnouncements.length);
+
+    if (flashAnnouncements.length === 0) {
+        overlay.classList.remove('active');
         return;
     }
 
@@ -94,22 +100,46 @@ function checkFlash(flashAnnouncements) {
     // Find the first active flash announcement
     for (const flash of flashAnnouncements) {
         // Flash Date + Start Time
-        const flashStart = new Date(`${flash.date}T${flash.startTime}`);
-        const durationMs = (flash.duration || 5) * 60 * 1000;
+        // Ensure robust date parsing
+        const datePart = flash.date; // YYYY-MM-DD
+        const timePart = flash.startTime; // HH:MM
+
+        if (!datePart || !timePart) {
+            console.warn('Skipping flash with missing date/time:', flash);
+            continue;
+        }
+
+        const flashStart = new Date(`${datePart}T${timePart}:00`);
+        const durationMs = (parseInt(flash.duration || 5)) * 60 * 1000;
         const flashEnd = new Date(flashStart.getTime() + durationMs);
+
+        console.log(`Flash: "${flash.title}" | Start: ${flashStart.toLocaleTimeString()} | End: ${flashEnd.toLocaleTimeString()} | Now: ${now.toLocaleTimeString()}`);
 
         if (now >= flashStart && now <= flashEnd) {
             activeFlash = flash;
-            break; // Show only one at a time (priority to the first found or sorted)
+            console.log('>>> ACTIVE FLASH FOUND! <<<');
+            break;
+        } else {
+            console.log('--- Not currently active');
         }
     }
 
     if (activeFlash) {
         titleEl.textContent = activeFlash.title;
         messageEl.textContent = activeFlash.message;
-        overlay.classList.add('active');
+        overlay.style.display = 'flex'; // Force display flex before adding active class
+        // Small timeout to allow transition
+        setTimeout(() => {
+            overlay.classList.add('active');
+        }, 10);
     } else {
         overlay.classList.remove('active');
+        // Hide completely after transition
+        setTimeout(() => {
+            if (!overlay.classList.contains('active')) {
+                overlay.style.display = 'none';
+            }
+        }, 500);
     }
 }
 
@@ -209,7 +239,7 @@ function createExclusionCard(data) {
                     <span>السبب: <strong>${data.reason}</strong></span>
                 </div>
                  <div class="card-detail">
-                    <span>المدة: <strong>${data.period}</strong></span>
+                    <span>المدة: <strong>${data.period === 'Définitive' ? 'نهائي' : data.period}</strong></span>
                 </div>
                 ${data.notes ? `<div class="card-detail"><span>${data.notes}</span></div>` : ''}
             </div>
