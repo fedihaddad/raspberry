@@ -28,21 +28,6 @@
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    --gradient-info: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-
-    /* Shadows */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
-    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
-
-    /* Border Radius */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
 }
 
 body {
@@ -51,6 +36,7 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    margin: 0;
 }
 
 /* Animated Background */
@@ -80,45 +66,53 @@ body::before {
     }
 }
 
-/* ========================================
-   TOP BAR
-   ======================================== */
-.top-bar {
+/* HEADER */
+.header {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 25px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 48px;
-    background: rgba(30, 41, 59, 0.8);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: var(--shadow-md);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    border-bottom: 4px solid var(--accent);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
-.school-info {
+.logo-section {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 20px;
 }
 
-.school-name {
-    font-size: 32px;
+.logo-icon {
+    font-size: 3.5rem;
+    background: white;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    /* Très grand titre */
     font-weight: 800;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.5px;
-}
-
-.school-subtitle {
-    font-size: 14px;
-    color: var(--text-muted);
-    font-weight: 500;
+    margin: 0;
+    color: white;
     text-transform: uppercase;
     letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.header p {
+    font-size: 1.2rem;
+    margin: 5px 0 0 0;
+    opacity: 0.9;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 2px;
 }
 
 .datetime {
@@ -126,26 +120,25 @@ body::before {
 }
 
 #time {
-    font-size: 36px;
+    font-size: 3rem;
+    /* Heure géante */
     font-weight: 700;
-    color: var(--text-primary);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -1px;
+    line-height: 1;
+    color: var(--accent);
 }
 
 #date {
-    font-size: 16px;
-    color: var(--text-secondary);
-    margin-top: 4px;
+    font-size: 1.4rem;
+    opacity: 0.9;
+    margin-top: 5px;
     font-weight: 500;
 }
 
-/* ========================================
-   MAIN CONTENT
-   ======================================== */
-.content {
-    padding: 48px;
+/* MAIN CONTENT */
+.main-content {
+    padding: 40px;
     max-width: 1600px;
+    /* Utilise tout l'écran */
     margin: 0 auto;
 }
 
@@ -156,11 +149,15 @@ body::before {
     margin-bottom: 40px;
 }
 
-.announcements-header h1 {
-    font-size: 42px;
-    font-weight: 800;
-    color: var(--text-primary);
-    letter-spacing: -1px;
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
 }
 
 .live-indicator {
