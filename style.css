@@ -1,15 +1,10 @@
 :root {
-    --bg-primary: #002855;
-    /* Bleu Collège Profond */
-    --bg-secondary: #001f40;
-    --text-primary: #ffffff;
-    --text-secondary: #e2e8f0;
+    --bg-primary: #0f172a;
+    /* Bleu Nuit Profond 'Slate 900' */
     --accent: #ef4444;
-    /* Rouge Vif mais pro */
-    --card-bg: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
-    --success: #22c55e;
-    --warning: #f59e0b;
-    --danger: #ef4444;
+    /* Rouge Vif */
+    --text-primary: #ffffff;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 body {
@@ -23,55 +18,55 @@ body {
 
 /* HEADER */
 .header {
-    background: rgba(0, 0, 0, 0.4);
-    padding: 15px 30px;
-    /* Moins de hauteur */
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    padding: 15px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 3px solid var(--accent);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
 }
 
 .logo-icon {
     font-size: 2.5rem;
-    /* Taille raisonnable */
-    background: white;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
     width: 60px;
     height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    border: 3px solid var(--accent);
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
-    /* Glow rouge autour du logo */
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: 2px solid white;
 }
 
 .header h1 {
-    font-size: 1.8rem;
-    /* Titre élégant */
+    font-size: 1.6rem;
     font-weight: 800;
     margin: 0;
     color: white;
     text-transform: uppercase;
     letter-spacing: 1px;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
 }
 
 .header p {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     margin: 2px 0 0 0;
-    opacity: 0.9;
-    color: #fca5a5;
+    opacity: 0.8;
+    color: #94a3b8;
     font-weight: 600;
     letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .datetime {
@@ -79,225 +74,185 @@ body {
 }
 
 #time {
-    font-size: 2.5rem;
-    /* Heure lisible mais pas énorme */
+    font-size: 2.8rem;
     font-weight: 700;
     line-height: 1;
     color: #ffffff;
-    /* FORCE WHITE */
     font-variant-numeric: tabular-nums;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 #date {
     font-size: 1rem;
-    color: #e2e8f0;
-    margin-top: 2px;
+    color: #cbd5e1;
+    margin-top: 4px;
     font-weight: 500;
+    text-transform: capitalize;
 }
 
 /* MAIN CONTENT */
 .main-content {
-    padding: 30px;
+    padding: 30px 40px;
     max-width: 1600px;
     margin: 0 auto;
 }
 
 .section-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     margin-bottom: 25px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     color: white;
-    font-weight: 400;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    padding-bottom: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
 }
 
 /* ANNOUNCEMENTS CONTAINER */
 .announcements-grid {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    /* Espace réduit entre les lignes */
+    gap: 16px;
 }
 
-/* ANNOUNCEMENT CARD - COMPACT ROW */
+/* ANNOUNCEMENT CARD - CLEAN DESIGN */
 .announcement-card {
     background: white;
-    border-radius: 10px;
+    border-radius: 16px;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    /* Centré verticalement */
+    align-items: stretch;
     padding: 0;
-    min-height: 90px;
-    /* HAUTEUR COMPACTE */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-left: 8px solid var(--accent);
+    min-height: 100px;
+    box-shadow: var(--card-shadow);
     overflow: hidden;
+    position: relative;
     opacity: 0;
-    animation: slideIn 0.5s ease-out forwards;
+    animation: slideIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Red defaults for all */
-.announcement-card.absent {
-    border-color: #dc2626;
-}
-
-.announcement-card.devoir {
-    border-color: #b91c1c;
-}
-
-.announcement-card.exclusion {
-    border-color: #7f1d1d;
-    background: #fff;
-}
-
-.announcement-card.other {
-    border-color: #ef4444;
-}
-
-/* LEFT: ICON - SLIM SIDEBAR */
+/* SIDEBAR COLOR (Fine et élégante) */
+/* On utilise le card-header comme conteneur pour la couleur et l'icone */
 .card-header {
+    width: 85px;
+    /* Largeur fixe contenue */
     background: var(--accent);
-    width: 90px;
-    /* Sidebar fine */
-    align-self: stretch;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 10px;
     color: white;
-    text-align: center;
+    padding: 10px;
 }
 
 .card-icon {
-    font-size: 2.5rem;
-    /* Icône taille normale */
-    margin-bottom: 5px;
+    font-size: 2.2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .card-type {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 2px 8px;
-    border-radius: 10px;
     display: none;
-    /* On cache le texte du type pour gagner de la place, l'icône suffit */
+    /* On cache le texte, le code couleur + icone suffisent */
 }
 
-/* RIGHT: CONTENT - HORIZONTAL LAYOUT */
+/* CARD BODY (Stack Title UP, Details DOWN) */
 .card-body {
     flex: 1;
     padding: 15px 25px;
     display: flex;
-    flex-direction: row;
-    /* Retour à l'horizontale pour être compact */
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+    flex-direction: column;
+    /* Vertical layout is safer for long names */
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px;
+    /* Espace entre le titre et les détails */
+    min-width: 0;
 }
 
+/* TITLE */
 .card-title {
     font-size: 1.6rem;
-    /* Titre PROPRE et LISIBLE */
-    font-weight: 700;
-    color: #1e293b;
+    font-weight: 800;
+    color: #0f172a;
     margin: 0;
     line-height: 1.2;
-    flex: 1;
+    width: 100%;
+    /* Gestion des noms très longs : */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Separator line between title and details */
-.card-title::after {
-    display: none;
-    /* Suppression de la ligne décorative */
-}
-
+/* CONTENT ROW */
 .card-content {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    /* Permet aux détails de passer à la ligne si besoin */
-    gap: 15px;
+    /* Les badges passent à la ligne si besoin */
+    gap: 10px;
     width: 100%;
 }
 
-/* DETAILS PILLS COMPACT */
+/* BADGES / DETAILS */
 .card-detail {
-    background: #f8fafc;
-    color: #334155;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    /* Taille standard */
+    background: #f1f5f9;
+    color: #475569;
+    padding: 6px 14px;
+    border-radius: 50px;
+    /* Pill shape */
+    font-size: 0.95rem;
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 8px;
     border: 1px solid #e2e8f0;
+    white-space: nowrap;
 }
 
-/* Highlight important details in faint red */
+/* Le premier détail est souvent le plus important (ex: Motif ou Période) */
 .card-detail:first-child {
-    background: #fef2f2;
-    border-color: #fecaca;
-    color: #b91c1c;
-}
-
-.card-detail-icon {
-    display: none;
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3;
 }
 
 .card-footer {
     display: none;
 }
 
-/* ANIMATION */
+/* Red variants applied to card-header automatically */
+.announcement-card.absent .card-header {
+    background: #dc2626;
+}
+
+.announcement-card.devoir .card-header {
+    background: #b91c1c;
+}
+
+.announcement-card.exclusion .card-header {
+    background: #991b1b;
+}
+
+.announcement-card.other .card-header {
+    background: #ef4444;
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform: translateX(-30px);
+        transform: translateY(10px);
     }
 
     to {
         opacity: 1;
-        transform: translateX(0);
+        transform: translateY(0);
     }
 }
 
-/* RESPONSIVE */
-@media (max-width: 1000px) {
-    .announcement-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .card-header {
-        width: 100%;
-        flex-direction: row;
-        justify-content: flex-start;
-        gap: 20px;
-        padding: 15px;
-    }
-
-    .card-body {
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-    }
-
-    .card-title {
-        font-size: 2rem;
-    }
-}
-
-/* ADMIN PAGE STYLES (Keep strict layout for admin) */
+/* ======= ADMIN Styles (Preserved) ======= */
 .admin-body {
     background: #f1f5f9;
     color: #1e293b;
@@ -313,7 +268,6 @@ body {
     background: white;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
@@ -322,17 +276,7 @@ body {
 
 .admin-header h1 {
     font-size: 1.5rem;
-    color: #1e293b;
     margin: 0;
-}
-
-.btn-back {
-    text-decoration: none;
-    color: #64748b;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 .form-container {
@@ -363,22 +307,12 @@ body {
     border-radius: 10px;
     background: white;
     cursor: pointer;
-    transition: all 0.2s;
-}
-
-.type-btn:hover {
-    border-color: #3b82f6;
-    background: #eff6ff;
 }
 
 .type-btn.active {
     border-color: #3b82f6;
     background: #eff6ff;
     color: #1d4ed8;
-}
-
-.type-icon {
-    font-size: 1.5rem;
 }
 
 .announcement-form {
@@ -417,25 +351,6 @@ textarea {
     padding: 12px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
-    font-size: 1rem;
-    font-family: inherit;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    ring: 2px solid rgba(59, 130, 246, 0.1);
-}
-
-.calculated-period {
-    padding: 12px;
-    background: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 8px;
-    color: #64748b;
-    font-size: 0.9rem;
 }
 
 .btn-submit {
@@ -445,21 +360,37 @@ textarea:focus {
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.login-body {
+    background: #0f172a;
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    min-height: 100vh;
 }
 
-.btn-submit:hover {
-    background: #2563eb;
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
 }
 
-/* MANAGE LIST STYLES */
 .manage-list {
     display: flex;
     flex-direction: column;
@@ -476,11 +407,6 @@ textarea:focus {
     align-items: center;
 }
 
-.manage-actions {
-    display: flex;
-    gap: 10px;
-}
-
 .btn-edit,
 .btn-delete {
     padding: 8px 12px;
@@ -488,6 +414,7 @@ textarea:focus {
     border: none;
     cursor: pointer;
     font-weight: 600;
+    margin-left: 5px;
 }
 
 .btn-edit {
@@ -500,30 +427,6 @@ textarea:focus {
     color: #dc2626;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-/* LOGIN PAGE */
-.login-body {
-    background: #0f172a;
+.manage-actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-}
-
-.login-card {
-    background: white;
-    padding: 40px;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
 }
