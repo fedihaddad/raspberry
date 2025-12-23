@@ -13,12 +13,15 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+    font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+    /* Police Arabe */
     background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
     margin: 0;
+    direction: rtl;
+    /* DIRECTION DROITE -> GAUCHE */
 }
 
 /* HEADER - DARK THEME */
@@ -59,9 +62,8 @@ body {
     font-weight: 800;
     margin: 0;
     color: white;
-    /* Titre blanc sur fond dark */
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0;
+    /* Pas d'espacement en arabe */
 }
 
 .header p {
@@ -69,14 +71,12 @@ body {
     margin: 2px 0 0 0;
     opacity: 0.8;
     color: #cbd5e1;
-    /* Gris clair */
     font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
 }
 
 .datetime {
-    text-align: right;
+    text-align: left;
+    /* Inverse en RTL : Gauche = Fin de ligne */
 }
 
 #time {
@@ -84,9 +84,11 @@ body {
     font-weight: 700;
     line-height: 1;
     color: #ffffff;
-    /* BLANC PUR */
     font-variant-numeric: tabular-nums;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    direction: ltr;
+    /* Garder l'heure en format latin pour les chiffres */
+    display: inline-block;
 }
 
 #date {
@@ -94,7 +96,6 @@ body {
     color: #e2e8f0;
     margin-top: 4px;
     font-weight: 500;
-    text-transform: capitalize;
 }
 
 /* MAIN CONTENT */
@@ -111,7 +112,6 @@ body {
     align-items: center;
     gap: 12px;
     color: #1e293b;
-    /* Titre foncé sur fond blanc */
     font-weight: 700;
     border-bottom: 2px solid #e2e8f0;
     padding-bottom: 10px;
@@ -127,7 +127,6 @@ body {
 /* ANNOUNCEMENT CARD - GREY BACKGROUND */
 .announcement-card {
     background: var(--card-bg);
-    /* GRIS MOYEN */
     border-radius: 12px;
     display: flex;
     flex-direction: row;
@@ -143,7 +142,7 @@ body {
     /* Bordure gris un peu plus foncé */
 }
 
-/* SIDEBAR COLOR */
+/* SIDEBAR COLOR (RTL: Toujours le premier enfant du flex, donc à droite) */
 .card-header {
     width: 80px;
     background: var(--accent);
@@ -175,6 +174,8 @@ body {
     align-items: flex-start;
     gap: 8px;
     min-width: 0;
+    text-align: right;
+    /* Force RTL Text Align */
 }
 
 /* TITLE (Nom Prof) */

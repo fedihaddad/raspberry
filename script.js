@@ -20,11 +20,11 @@ function updateDateTime() {
         day: 'numeric'
     };
 
-    const time = now.toLocaleTimeString('fr-FR', timeOptions);
-    const date = now.toLocaleDateString('fr-FR', dateOptions);
+    const time = now.toLocaleTimeString('fr-FR', timeOptions); // Heure reste format 24h
+    const date = now.toLocaleDateString('ar-TN', dateOptions); // Date en Arabe
 
     document.getElementById('time').textContent = time;
-    document.getElementById('date').textContent = date.charAt(0).toUpperCase() + date.slice(1);
+    document.getElementById('date').textContent = date;
 }
 
 // Load and Display Announcements
@@ -33,43 +33,33 @@ async function loadAnnouncements() {
     const noAnnouncementsDiv = document.getElementById('no-announcements');
 
     try {
-        // Get announcements from API
         const announcements = await window.announcementAPI.getAll();
-
-        // Create data hash for comparison
         const currentDataStr = JSON.stringify(announcements);
         const currentHash = currentDataStr.length + '_' + currentDataStr.substring(0, 50);
 
-        // Only update DOM if data changed
-        if (lastDataHash === currentHash) {
-            return;
-        }
+        if (lastDataHash === currentHash) return;
 
-        // Clear container
         container.innerHTML = '';
 
         if (announcements.length === 0) {
             container.style.display = 'none';
-            noAnnouncementsDiv.style.display = 'flex';
+            if (noAnnouncementsDiv) {
+                noAnnouncementsDiv.style.display = 'flex';
+                noAnnouncementsDiv.innerHTML = '<h1>لا توجد إعلانات حالياً</h1>';
+            }
             lastDataHash = currentHash;
             localStorage.setItem('announcements', currentDataStr);
             return;
         }
 
-        container.style.display = 'grid';
-        noAnnouncementsDiv.style.display = 'none';
+        container.style.display = 'flex'; // Flex column from CSS
+        if (noAnnouncementsDiv) noAnnouncementsDiv.style.display = 'none';
 
-        // Sort announcements by timestamp (newest first)
-        // Note: API already sorts by timestamp DESC, but good to be safe
-        // announcements is already an array from API
-
-        // Display each announcement
         announcements.forEach((announcement, index) => {
             const card = createAnnouncementCard(announcement, index);
             container.appendChild(card);
         });
 
-        // Update local cache and hash
         localStorage.setItem('announcements', currentDataStr);
         lastDataHash = currentHash;
 
@@ -87,32 +77,21 @@ function createAnnouncementCard(announcement, index) {
     let cardContent = '';
 
     switch (announcement.type) {
-        case 'absent':
-            cardContent = createAbsentCard(announcement);
-            break;
-        case 'devoir':
-            cardContent = createDevoirCard(announcement);
-            break;
-        case 'exclusion':
-            cardContent = createExclusionCard(announcement);
-            break;
-        case 'other':
-            cardContent = createOtherCard(announcement);
-            break;
+        case 'absent': cardContent = createAbsentCard(announcement); break;
+        case 'devoir': cardContent = createDevoirCard(announcement); break;
+        case 'exclusion': cardContent = createExclusionCard(announcement); break;
+        case 'other': cardContent = createOtherCard(announcement); break;
     }
 
     card.innerHTML = cardContent;
     return card;
 }
 
-// Create Absent Teacher Card
+// Create Absent Teacher Card (Arabic)
 function createAbsentCard(data) {
     const icon = '👨‍🏫';
-    // Phrase naturelle
-    const title = `Le professeur ${data.professeur}`;
-    const subtitle = `Matière : ${data.matiere}`;
+    const title = `الأستاذ(ة) ${data.professeur}`;
 
-    // Contenu narratif
     return `
         <div class="card-header">
             <span class="card-icon">${icon}</span>
@@ -121,22 +100,25 @@ function createAbsentCard(data) {
             <h3 class="card-title">${title}</h3>
             <div class="card-content">
                  <div class="card-detail">
-                    <span>Est absent pour <strong>${data.period}</strong></span>
+                    <span>غياب مادة <strong>${data.matiere}</strong></span>
+                </div>
+                 <div class="card-detail">
+                    <span>المدة: <strong>${data.period}</strong></span>
                 </div>
                 <div class="card-detail">
-                    <span>Classes concernées: <strong>${data.classes}</strong></span>
+                    <span>الأقسام: <strong>${data.classes}</strong></span>
                 </div>
-                 ${data.notes ? `<div class="card-detail"><span>Note: ${data.notes}</span></div>` : ''}
+                 ${data.notes ? `<div class="card-detail"><span>ملاحظة: ${data.notes}</span></div>` : ''}
             </div>
         </div>
     `;
 }
 
-// Create Devoir/Exam Card
+// Create Devoir/Exam Card (Arabic)
 function createDevoirCard(data) {
     const icon = '📝';
-    const typeLabel = data.devoirType || 'Devoir';
-    const title = `${typeLabel} de ${data.matiere}`;
+    const typeLabel = data.devoirType === 'Contrôle' ? 'فرض مراقبة' : 'فرض تأليفي';
+    const title = `${typeLabel} في ${data.matiere}`;
 
     return `
         <div class="card-header">
@@ -146,25 +128,27 @@ function createDevoirCard(data) {
              <h3 class="card-title">${title}</h3>
              <div class="card-content">
                 <div class="card-detail">
-                    <span>Pour la classe: <strong>${data.class}</strong></span>
+                    <span>القسم: <strong>${data.class}</strong></span>
                 </div>
                 <div class="card-detail">
-                    <span>Le <strong>${formatDate(data.date)}</strong> de ${data.startTime} à ${data.endTime}</span>
+                    <span>تاريخ: <strong>${formatDate(data.date)}</strong></span>
                 </div>
                 <div class="card-detail">
-                    <span>Salle: <strong>${data.salle}</strong></span>
+                    <span>التوقيت: من ${data.startTime} إلى ${data.endTime}</span>
                 </div>
-                ${data.notes ? `<div class="card-detail"><span>${data.notes}</span></div>` : ''}
+                <div class="card-detail">
+                    <span>القاعة: <strong>${data.salle}</strong></span>
+                </div>
              </div>
         </div>
     `;
 }
 
-// Create Exclusion Card
+// Create Exclusion Card (Arabic)
 function createExclusionCard(data) {
     const icon = '🚫';
-    const typeLabel = data.exclusionType === 'permanent' ? 'Exclusion Définitive' : 'Exclusion Temporaire';
-    const title = `L'élève ${data.student} (${data.class})`;
+    const typeLabel = data.exclusionType === 'permanent' ? 'طرد نهائي' : 'طرد مؤقت';
+    const title = `التلميذ(ة) ${data.student} (${data.class})`;
 
     return `
         <div class="card-header">
@@ -174,31 +158,20 @@ function createExclusionCard(data) {
             <h3 class="card-title">${title}</h3>
             <div class="card-content">
                 <div class="card-detail">
-                    <span>${typeLabel} pour le motif : <strong>${data.reason}</strong></span>
+                    <span>${typeLabel} - السبب: <strong>${data.reason}</strong></span>
                 </div>
                  <div class="card-detail">
-                    <span>Durée : <strong>${data.period}</strong></span>
+                    <span>المدة: <strong>${data.period}</strong></span>
                 </div>
-                ${data.notes ? `<div class="card-detail"><span>${data.notes}</span></div>` : ''}
             </div>
         </div>
     `;
 }
 
-// Create Other Announcement Card
+// Create Other Announcement Card (Arabic)
 function createOtherCard(data) {
-    const icons = {
-        info: 'ℹ️',
-        event: '🎉',
-        urgent: '⚠️',
-        holiday: '🏖️',
-        activity: '🎨',
-        reminder: '🔔',
-        director: '👔'
-    };
-
+    const icons = { info: 'ℹ️', event: '🎉', urgent: '⚠️', holiday: '🏖️', activity: '🎨', reminder: '🔔', director: '👔' };
     const icon = icons[data.category] || '📢';
-    const typeLabel = data.category ? data.category.charAt(0).toUpperCase() + data.category.slice(1) : 'Information';
 
     return `
         <div class="card-header">
@@ -207,37 +180,24 @@ function createOtherCard(data) {
         <div class="card-body">
             <h3 class="card-title">${data.title}</h3>
              <div class="card-content">
-                <div class="card-detail" style="background:transparent; border:none; padding-left:0; font-weight:500;">
+                <div class="card-detail">
                     ${data.description}
                 </div>
-                 ${data.date ? `<div class="card-detail"><span>Date : ${formatDate(data.date)}</span></div>` : ''}
-                 ${data.location ? `<div class="card-detail"><span>Lieu : ${data.location}</span></div>` : ''}
+                 ${data.date ? `<div class="card-detail"><span>التاريخ: ${formatDate(data.date)}</span></div>` : ''}
+                 ${data.location ? `<div class="card-detail"><span>المكان: ${data.location}</span></div>` : ''}
              </div>
         </div>
     `;
 }
 
-// Format Timestamp
 function formatTimestamp(timestamp) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return 'À l\'instant';
-    if (diffMins < 60) return `Il y a ${diffMins} min`;
-    if (diffHours < 24) return `Il y a ${diffHours}h`;
-    if (diffDays < 7) return `Il y a ${diffDays}j`;
-
-    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    return ""; // Hidden in new design
 }
 
-// Format Date
+// Format Date Arabic
 function formatDate(dateStr) {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('fr-FR', {
+    return date.toLocaleDateString('ar-TN', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',

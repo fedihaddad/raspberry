@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ar" dir="rtl">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ajouter une Annonce</title>
+  <title>إضافة إعلان جديد</title>
+  <!-- Import Cairo Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script>
     // Check authentication
@@ -14,7 +18,7 @@
 
     // Logout function
     function logout() {
-      if (confirm('Voulez-vous vraiment vous déconnecter?')) {
+      if (confirm('هل تريد حقاً تسجيل الخروج؟')) {
         sessionStorage.removeItem('isLoggedIn');
         sessionStorage.removeItem('loginTime');
         window.location.href = 'login.html';
@@ -26,259 +30,256 @@
 <body class="admin-body">
   <div class="admin-container">
     <div class="admin-header">
-      <h1>➕ Nouvelle Annonce</h1>
+      <h1>➕ إعلان جديد</h1>
       <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-        <a href="index.html" class="btn-back">← Retour à l'écran</a>
-        <button onclick="logout()" class="btn-logout">🚪 Déconnexion</button>
+        <a href="index.html" class="btn-back">← الشاشة الرئيسية</a>
+        <button onclick="logout()" class="btn-logout">🚪 خروج</button>
       </div>
     </div>
 
     <div class="form-container">
       <!-- TYPE SELECTOR -->
       <div class="type-selector">
-        <h2>Type d'Annonce</h2>
+        <h2>نوع الإعلان</h2>
         <div class="type-buttons">
           <button class="type-btn active" data-type="absent" onclick="selectType('absent')">
             <span class="type-icon">👨‍🏫</span>
-            <span class="type-label">Professeur Absent</span>
+            <span class="type-label">غياب أستاذ</span>
           </button>
           <button class="type-btn" data-type="devoir" onclick="selectType('devoir')">
             <span class="type-icon">📝</span>
-            <span class="type-label">Devoir / Examen</span>
+            <span class="type-label">فرض / امتحان</span>
           </button>
           <button class="type-btn" data-type="exclusion" onclick="selectType('exclusion')">
             <span class="type-icon">⚠️</span>
-            <span class="type-label">Exclusion Élève</span>
+            <span class="type-label">طرد تلميذ</span>
           </button>
           <button class="type-btn" data-type="other" onclick="selectType('other')">
             <span class="type-icon">📢</span>
-            <span class="type-label">Autre Annonce</span>
+            <span class="type-label">إعلان عام</span>
           </button>
         </div>
       </div>
 
       <!-- FORM FOR PROFESSEUR ABSENT -->
       <form id="form-absent" class="announcement-form active">
-        <h3>Professeur Absent</h3>
+        <h3>تسجيل غياب مدرس</h3>
 
         <div class="form-group">
-          <label for="absent-prof">Nom du Professeur *</label>
-          <input type="text" id="absent-prof" placeholder="Ex: M. Alami" required>
+          <label for="absent-prof">اسم الأستاذ *</label>
+          <input type="text" id="absent-prof" placeholder="مثال: الأستاذ محمد..." required>
         </div>
 
         <div class="form-group">
-          <label for="absent-matiere">Matière *</label>
-          <input type="text" id="absent-matiere" placeholder="Ex: Mathématiques" required>
+          <label for="absent-matiere">المادة *</label>
+          <input type="text" id="absent-matiere" placeholder="مثال: الرياضيات" required>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="absent-start">Date de Début *</label>
+            <label for="absent-start">من تاريخ *</label>
             <input type="date" id="absent-start" required>
           </div>
           <div class="form-group">
-            <label for="absent-end">Date de Fin *</label>
+            <label for="absent-end">إلى تاريخ *</label>
             <input type="date" id="absent-end" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Période Calculée</label>
+          <label>المدة المحسوبة</label>
           <div class="calculated-period" id="calculated-period">
-            Sélectionnez les dates pour calculer la période
+            اختر التواريخ لحساب المدة
           </div>
         </div>
 
         <div class="form-group">
-          <label for="absent-classes">Classes Concernées *</label>
-          <input type="text" id="absent-classes" placeholder="Ex: 1ère A, 1ère B, 2ème C" required>
+          <label for="absent-classes">الأقسام المعنية *</label>
+          <input type="text" id="absent-classes" placeholder="مثال: 7أ1, 8أ2..." required>
         </div>
 
         <div class="form-group">
-          <label for="absent-notes">Notes Supplémentaires</label>
-          <textarea id="absent-notes" rows="3" placeholder="Informations complémentaires..."></textarea>
+          <label for="absent-notes">ملاحظات إضافية</label>
+          <textarea id="absent-notes" rows="3" placeholder="أي معلومات إضافية للتلاميذ..."></textarea>
         </div>
 
         <button type="submit" class="btn-submit">
-          <span>✓</span> Publier l'Annonce
+          <span>✓</span> نشر الإعلان
         </button>
       </form>
 
       <!-- FORM FOR DEVOIR -->
       <form id="form-devoir" class="announcement-form">
-        <h3>Devoir / Examen</h3>
+        <h3>موعد فرض أو امتحان</h3>
 
         <div class="form-group">
-          <label for="devoir-type">Type *</label>
+          <label for="devoir-type">النوع *</label>
           <select id="devoir-type" required>
-            <option value="">Sélectionner...</option>
-            <option value="Devoir">Devoir</option>
-            <option value="Examen">Examen</option>
-            <option value="Contrôle">Contrôle</option>
-            <option value="Test">Test</option>
+            <option value="">اختر...</option>
+            <option value="Contrôle">فرض مراقبة</option>
+            <option value="Synthèse">فرض تأليفي</option>
+            <option value="Examen">امتحان</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="devoir-matiere">Matière *</label>
-          <input type="text" id="devoir-matiere" placeholder="Ex: Physique-Chimie" required>
+          <label for="devoir-matiere">المادة *</label>
+          <input type="text" id="devoir-matiere" placeholder="مثال: العلوم الطبيعية" required>
         </div>
 
         <div class="form-group">
-          <label for="devoir-class">Classe *</label>
-          <input type="text" id="devoir-class" placeholder="Ex: 3ème A" required>
+          <label for="devoir-class">القسم *</label>
+          <input type="text" id="devoir-class" placeholder="مثال: 9 أساسي 3" required>
         </div>
 
         <div class="form-group">
-          <label for="devoir-salle">Numéro de Salle *</label>
-          <input type="text" id="devoir-salle" placeholder="Ex: B12" required>
+          <label for="devoir-salle">القاعة *</label>
+          <input type="text" id="devoir-salle" placeholder="مثال: قاعة 12" required>
         </div>
 
         <div class="form-group">
-          <label for="devoir-date">Date *</label>
+          <label for="devoir-date">التاريخ *</label>
           <input type="date" id="devoir-date" required>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="devoir-start-time">Heure de Début *</label>
+            <label for="devoir-start-time">من الساعة *</label>
             <input type="time" id="devoir-start-time" required>
           </div>
           <div class="form-group">
-            <label for="devoir-end-time">Heure de Fin *</label>
+            <label for="devoir-end-time">إلى الساعة *</label>
             <input type="time" id="devoir-end-time" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Durée Calculée</label>
+          <label>المدة</label>
           <div class="calculated-period" id="calculated-duration">
-            Sélectionnez les heures pour calculer la durée
+            اختر التوقيت لحساب المدة
           </div>
         </div>
 
         <div class="form-group">
-          <label for="devoir-notes">Instructions Spéciales</label>
-          <textarea id="devoir-notes" rows="3"
-            placeholder="Ex: Apporter calculatrice, documents autorisés..."></textarea>
+          <label for="devoir-notes">تعليمات خاصة</label>
+          <textarea id="devoir-notes" rows="3" placeholder="مثال: إحضار الآلة الحاسبة..."></textarea>
         </div>
 
         <button type="submit" class="btn-submit">
-          <span>✓</span> Publier l'Annonce
+          <span>✓</span> نشر الإعلان
         </button>
       </form>
 
       <!-- FORM FOR STUDENT EXCLUSION -->
       <form id="form-exclusion" class="announcement-form">
-        <h3>Exclusion Élève</h3>
+        <h3>طرد / إقصاء تلميذ</h3>
 
         <div class="form-group">
-          <label for="exclusion-student">Nom de l'Élève *</label>
-          <input type="text" id="exclusion-student" placeholder="Ex: Ahmed Bennani" required>
+          <label for="exclusion-student">اسم التلميذ *</label>
+          <input type="text" id="exclusion-student" placeholder="الاسم واللقب" required>
         </div>
 
         <div class="form-group">
-          <label for="exclusion-class">Classe *</label>
-          <input type="text" id="exclusion-class" placeholder="Ex: 2ème B" required>
+          <label for="exclusion-class">القسم *</label>
+          <input type="text" id="exclusion-class" placeholder="مثال: 8 أساسي 5" required>
         </div>
 
         <div class="form-group">
-          <label for="exclusion-reason">Motif de l'Exclusion *</label>
-          <textarea id="exclusion-reason" rows="3" placeholder="Décrivez le motif de l'exclusion..."
-            required></textarea>
+          <label for="exclusion-reason">سبب الطرد *</label>
+          <textarea id="exclusion-reason" rows="3" placeholder="اكتب سبب الإقصاء..." required></textarea>
         </div>
 
         <div class="form-group">
-          <label for="exclusion-type">Type d'Exclusion *</label>
+          <label for="exclusion-type">نوع العقوبة *</label>
           <select id="exclusion-type" required onchange="toggleExclusionDates()">
-            <option value="">Sélectionner...</option>
-            <option value="temporary">Temporaire (avec dates)</option>
-            <option value="permanent">Définitive (permanente)</option>
+            <option value="">اختر...</option>
+            <option value="temporary">طرد مؤقت (بأيام)</option>
+            <option value="permanent">طرد نهائي (رفت)</option>
           </select>
         </div>
 
         <div id="exclusion-dates" style="display: none;">
           <div class="form-row">
             <div class="form-group">
-              <label for="exclusion-start">Date de Début</label>
+              <label for="exclusion-start">من تاريخ</label>
               <input type="date" id="exclusion-start">
             </div>
             <div class="form-group">
-              <label for="exclusion-end">Date de Fin</label>
+              <label for="exclusion-end">إلى تاريخ</label>
               <input type="date" id="exclusion-end">
             </div>
           </div>
 
           <div class="form-group">
-            <label>Période Calculée</label>
+            <label>المدة المحسوبة</label>
             <div class="calculated-period" id="calculated-exclusion-period">
-              Sélectionnez les dates pour calculer la période
+              اختر التواريخ لحساب المدة
             </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="exclusion-notes">Notes Additionnelles</label>
-          <textarea id="exclusion-notes" rows="3" placeholder="Informations complémentaires..."></textarea>
+          <label for="exclusion-notes">ملاحظات إدارية</label>
+          <textarea id="exclusion-notes" rows="3" placeholder="معلومات للإدارة فقط..."></textarea>
         </div>
 
         <button type="submit" class="btn-submit">
-          <span>✓</span> Publier l'Annonce
+          <span>✓</span> نشر الإعلان
         </button>
       </form>
 
       <!-- FORM FOR OTHER ANNOUNCEMENTS -->
       <form id="form-other" class="announcement-form">
-        <h3>Autre Annonce</h3>
+        <h3>إعلان عام / إداري</h3>
 
         <div class="form-group">
-          <label for="other-title">Titre de l'Annonce *</label>
-          <input type="text" id="other-title" placeholder="Ex: Réunion Parents-Professeurs" required>
+          <label for="other-title">عنوان الإعلان *</label>
+          <input type="text" id="other-title" placeholder="مثال: اجتماع أولياء الأمور" required>
         </div>
 
         <div class="form-group">
-          <label for="other-category">Catégorie *</label>
+          <label for="other-category">التصنيف *</label>
           <select id="other-category" required>
-            <option value="">Sélectionner...</option>
-            <option value="info">Information</option>
-            <option value="event">Événement</option>
-            <option value="urgent">Urgent</option>
-            <option value="holiday">Vacances</option>
-            <option value="activity">Activité</option>
-            <option value="reminder">Rappel</option>
-            <option value="director">Message du Directeur</option>
+            <option value="">اختر...</option>
+            <option value="info">معلومة</option>
+            <option value="event">حدث / نشاط</option>
+            <option value="urgent">عاجل</option>
+            <option value="holiday">عطلة</option>
+            <option value="activity">نشاط ثقافي</option>
+            <option value="reminder">تذكير</option>
+            <option value="director">من الإدارة</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="other-description">Description *</label>
-          <textarea id="other-description" rows="4" placeholder="Détails de l'annonce..." required></textarea>
+          <label for="other-description">نص الإعلان *</label>
+          <textarea id="other-description" rows="4" placeholder="اكتب تفاصيل الإعلان هنا..." required></textarea>
         </div>
 
         <div class="form-group">
-          <label for="other-date">Date (Optionnel)</label>
+          <label for="other-date">التاريخ (اختياري)</label>
           <input type="date" id="other-date">
         </div>
 
         <div class="form-group">
-          <label for="other-time">Heure (Optionnel)</label>
+          <label for="other-time">التوقيت (اختياري)</label>
           <input type="time" id="other-time">
         </div>
 
         <div class="form-group">
-          <label for="other-location">Lieu (Optionnel)</label>
-          <input type="text" id="other-location" placeholder="Ex: Amphithéâtre, Cour principale...">
+          <label for="other-location">المكان (اختياري)</label>
+          <input type="text" id="other-location" placeholder="مثال: الساحة الرئيسية">
         </div>
 
         <button type="submit" class="btn-submit">
-          <span>✓</span> Publier l'Annonce
+          <span>✓</span> نشر الإعلان
         </button>
       </form>
     </div>
 
     <!-- MANAGE ANNOUNCEMENTS -->
     <div class="manage-section">
-      <h2>📋 Gérer les Annonces</h2>
+      <h2>📋 إدارة الإعلانات المنشورة</h2>
       <div id="manage-list" class="manage-list">
         <!-- Existing announcements will be listed here -->
       </div>
