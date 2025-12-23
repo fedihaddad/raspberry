@@ -1,9 +1,14 @@
 :root {
-    --bg-primary: #0f172a;
-    /* Bleu Nuit Profond 'Slate 900' */
+    --bg-primary: #ffffff;
+    /* Fond Blanc */
     --accent: #ef4444;
     /* Rouge Vif */
-    --text-primary: #ffffff;
+    --text-primary: #1e293b;
+    /* Texte Foncé */
+    --card-bg: #f1f5f9;
+    /* Gris Clair/Moyen pour les cartes */
+    --header-bg: #0f172a;
+    /* Bleu Nuit pour le Header */
     --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
@@ -16,16 +21,15 @@ body {
     margin: 0;
 }
 
-/* HEADER */
+/* HEADER - DARK THEME */
 .header {
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(12px);
+    background: var(--header-bg);
     padding: 15px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-bottom: 4px solid var(--accent);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -39,31 +43,33 @@ body {
 
 .logo-icon {
     font-size: 2.5rem;
-    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    background: white;
     width: 60px;
     height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 16px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     border: 2px solid white;
 }
 
 .header h1 {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 800;
     margin: 0;
     color: white;
+    /* Titre blanc sur fond dark */
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .header p {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     margin: 2px 0 0 0;
     opacity: 0.8;
-    color: #94a3b8;
+    color: #cbd5e1;
+    /* Gris clair */
     font-weight: 600;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -74,17 +80,18 @@ body {
 }
 
 #time {
-    font-size: 2.8rem;
+    font-size: 3rem;
     font-weight: 700;
     line-height: 1;
     color: #ffffff;
+    /* BLANC PUR */
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 #date {
     font-size: 1rem;
-    color: #cbd5e1;
+    color: #e2e8f0;
     margin-top: 4px;
     font-weight: 500;
     text-transform: capitalize;
@@ -98,15 +105,16 @@ body {
 }
 
 .section-title {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     margin-bottom: 25px;
     display: flex;
     align-items: center;
     gap: 12px;
-    color: white;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    opacity: 0.9;
+    color: #1e293b;
+    /* Titre foncé sur fond blanc */
+    font-weight: 700;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
 }
 
 /* ANNOUNCEMENTS CONTAINER */
@@ -116,28 +124,28 @@ body {
     gap: 16px;
 }
 
-/* ANNOUNCEMENT CARD - CLEAN DESIGN */
+/* ANNOUNCEMENT CARD - GREY BACKGROUND */
 .announcement-card {
-    background: white;
-    border-radius: 16px;
+    background: var(--card-bg);
+    /* GRIS MOYEN */
+    border-radius: 12px;
     display: flex;
     flex-direction: row;
     align-items: stretch;
     padding: 0;
-    min-height: 100px;
-    box-shadow: var(--card-shadow);
+    min-height: 110px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     position: relative;
     opacity: 0;
     animation: slideIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid #cbd5e1;
+    /* Bordure gris un peu plus foncé */
 }
 
-/* SIDEBAR COLOR (Fine et élégante) */
-/* On utilise le card-header comme conteneur pour la couleur et l'icone */
+/* SIDEBAR COLOR */
 .card-header {
-    width: 85px;
-    /* Largeur fixe contenue */
+    width: 80px;
     background: var(--accent);
     flex-shrink: 0;
     display: flex;
@@ -150,37 +158,34 @@ body {
 
 .card-icon {
     font-size: 2.2rem;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
 }
 
 .card-type {
     display: none;
-    /* On cache le texte, le code couleur + icone suffisent */
 }
 
-/* CARD BODY (Stack Title UP, Details DOWN) */
+/* CARD BODY */
 .card-body {
     flex: 1;
     padding: 15px 25px;
     display: flex;
     flex-direction: column;
-    /* Vertical layout is safer for long names */
     justify-content: center;
     align-items: flex-start;
-    gap: 10px;
-    /* Espace entre le titre et les détails */
+    gap: 8px;
     min-width: 0;
 }
 
-/* TITLE */
+/* TITLE (Nom Prof) */
 .card-title {
     font-size: 1.6rem;
     font-weight: 800;
     color: #0f172a;
+    /* Noir bleuté */
     margin: 0;
     line-height: 1.2;
     width: 100%;
-    /* Gestion des noms très longs : */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -191,36 +196,35 @@ body {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    /* Les badges passent à la ligne si besoin */
     gap: 10px;
     width: 100%;
 }
 
 /* BADGES / DETAILS */
 .card-detail {
-    background: #f1f5f9;
+    background: white;
+    /* Badge Blanc sur fond gris */
     color: #475569;
     padding: 6px 14px;
     border-radius: 50px;
-    /* Pill shape */
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 8px;
     border: 1px solid #e2e8f0;
     white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    /* Petite ombre pour ressortir */
 }
 
-/* Le premier détail est souvent le plus important (ex: Motif ou Période) */
+/* Important Details Highlight */
 .card-detail:first-child {
-    background: #fff1f2;
+    background: white;
     color: #be123c;
+    /* Texte Rouge */
     border-color: #fecdd3;
-}
-
-.card-footer {
-    display: none;
+    /* Bordure rouge pâle */
 }
 
 /* Red variants applied to card-header automatically */
@@ -240,6 +244,10 @@ body {
     background: #ef4444;
 }
 
+.card-footer {
+    display: none;
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -252,7 +260,7 @@ body {
     }
 }
 
-/* ======= ADMIN Styles (Preserved) ======= */
+/* ======= ADMIN Styles ======= */
 .admin-body {
     background: #f1f5f9;
     color: #1e293b;

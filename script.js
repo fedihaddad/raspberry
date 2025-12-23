@@ -108,35 +108,26 @@ function createAnnouncementCard(announcement, index) {
 // Create Absent Teacher Card
 function createAbsentCard(data) {
     const icon = '👨‍🏫';
-    const typeLabel = 'Professeur Absent';
+    // Phrase naturelle
+    const title = `Le professeur ${data.professeur}`;
+    const subtitle = `Matière : ${data.matiere}`;
 
+    // Contenu narratif
     return `
         <div class="card-header">
             <span class="card-icon">${icon}</span>
-            <span class="card-type">${typeLabel}</span>
         </div>
-        <h3 class="card-title">${data.professeur} - ${data.matiere}</h3>
-        <div class="card-content">
-            <div class="card-detail">
-                <span class="card-detail-icon">📅</span>
-                <span><strong>Période:</strong> ${data.period}</span>
+        <div class="card-body">
+            <h3 class="card-title">${title}</h3>
+            <div class="card-content">
+                 <div class="card-detail">
+                    <span>Est absent pour <strong>${data.period}</strong></span>
+                </div>
+                <div class="card-detail">
+                    <span>Classes concernées: <strong>${data.classes}</strong></span>
+                </div>
+                 ${data.notes ? `<div class="card-detail"><span>Note: ${data.notes}</span></div>` : ''}
             </div>
-            <div class="card-detail">
-                <span class="card-detail-icon">🎓</span>
-                <span><strong>Classes:</strong> ${data.classes}</span>
-            </div>
-            ${data.notes ? `
-            <div class="card-detail">
-                <span class="card-detail-icon">📝</span>
-                <span>${data.notes}</span>
-            </div>
-            ` : ''}
-        </div>
-        <div class="card-footer">
-            <span class="card-timestamp">
-                <span>🕐</span>
-                <span>${formatTimestamp(data.timestamp)}</span>
-            </span>
         </div>
     `;
 }
@@ -145,74 +136,51 @@ function createAbsentCard(data) {
 function createDevoirCard(data) {
     const icon = '📝';
     const typeLabel = data.devoirType || 'Devoir';
+    const title = `${typeLabel} de ${data.matiere}`;
 
     return `
         <div class="card-header">
             <span class="card-icon">${icon}</span>
-            <span class="card-type">${typeLabel}</span>
         </div>
-        <h3 class="card-title">${data.matiere} - ${data.class}</h3>
-        <div class="card-content">
-            <div class="card-detail">
-                <span class="card-detail-icon">📍</span>
-                <span><strong>Salle:</strong> ${data.salle}</span>
-            </div>
-            <div class="card-detail">
-                <span class="card-detail-icon">📅</span>
-                <span><strong>Date:</strong> ${formatDate(data.date)}</span>
-            </div>
-            <div class="card-detail">
-                <span class="card-detail-icon">⏰</span>
-                <span><strong>Horaire:</strong> ${data.startTime} - ${data.endTime} (${data.duration})</span>
-            </div>
-            ${data.notes ? `
-            <div class="card-detail">
-                <span class="card-detail-icon">ℹ️</span>
-                <span>${data.notes}</span>
-            </div>
-            ` : ''}
-        </div>
-        <div class="card-footer">
-            <span class="card-timestamp">
-                <span>🕐</span>
-                <span>${formatTimestamp(data.timestamp)}</span>
-            </span>
+        <div class="card-body">
+             <h3 class="card-title">${title}</h3>
+             <div class="card-content">
+                <div class="card-detail">
+                    <span>Pour la classe: <strong>${data.class}</strong></span>
+                </div>
+                <div class="card-detail">
+                    <span>Le <strong>${formatDate(data.date)}</strong> de ${data.startTime} à ${data.endTime}</span>
+                </div>
+                <div class="card-detail">
+                    <span>Salle: <strong>${data.salle}</strong></span>
+                </div>
+                ${data.notes ? `<div class="card-detail"><span>${data.notes}</span></div>` : ''}
+             </div>
         </div>
     `;
 }
 
 // Create Exclusion Card
 function createExclusionCard(data) {
-    const icon = '⚠️';
+    const icon = '🚫';
     const typeLabel = data.exclusionType === 'permanent' ? 'Exclusion Définitive' : 'Exclusion Temporaire';
+    const title = `L'élève ${data.student} (${data.class})`;
 
     return `
         <div class="card-header">
             <span class="card-icon">${icon}</span>
-            <span class="card-type">${typeLabel}</span>
         </div>
-        <h3 class="card-title">${data.student} - ${data.class}</h3>
-        <div class="card-content">
-            <div class="card-detail">
-                <span class="card-detail-icon">📋</span>
-                <span><strong>Motif:</strong> ${data.reason}</span>
+        <div class="card-body">
+            <h3 class="card-title">${title}</h3>
+            <div class="card-content">
+                <div class="card-detail">
+                    <span>${typeLabel} pour le motif : <strong>${data.reason}</strong></span>
+                </div>
+                 <div class="card-detail">
+                    <span>Durée : <strong>${data.period}</strong></span>
+                </div>
+                ${data.notes ? `<div class="card-detail"><span>${data.notes}</span></div>` : ''}
             </div>
-            <div class="card-detail">
-                <span class="card-detail-icon">📅</span>
-                <span><strong>Période:</strong> ${data.period}</span>
-            </div>
-            ${data.notes ? `
-            <div class="card-detail">
-                <span class="card-detail-icon">📝</span>
-                <span>${data.notes}</span>
-            </div>
-            ` : ''}
-        </div>
-        <div class="card-footer">
-            <span class="card-timestamp">
-                <span>🕐</span>
-                <span>${formatTimestamp(data.timestamp)}</span>
-            </span>
         </div>
     `;
 }
@@ -230,40 +198,21 @@ function createOtherCard(data) {
     };
 
     const icon = icons[data.category] || '📢';
-    const typeLabel = data.category ? data.category.charAt(0).toUpperCase() + data.category.slice(1) : 'Annonce';
+    const typeLabel = data.category ? data.category.charAt(0).toUpperCase() + data.category.slice(1) : 'Information';
 
     return `
         <div class="card-header">
             <span class="card-icon">${icon}</span>
-            <span class="card-type">${typeLabel}</span>
         </div>
-        <h3 class="card-title">${data.title}</h3>
-        <div class="card-content">
-            <p>${data.description}</p>
-            ${data.date ? `
-            <div class="card-detail">
-                <span class="card-detail-icon">📅</span>
-                <span><strong>Date:</strong> ${formatDate(data.date)}</span>
-            </div>
-            ` : ''}
-            ${data.time ? `
-            <div class="card-detail">
-                <span class="card-detail-icon">⏰</span>
-                <span><strong>Heure:</strong> ${data.time}</span>
-            </div>
-            ` : ''}
-            ${data.location ? `
-            <div class="card-detail">
-                <span class="card-detail-icon">📍</span>
-                <span><strong>Lieu:</strong> ${data.location}</span>
-            </div>
-            ` : ''}
-        </div>
-        <div class="card-footer">
-            <span class="card-timestamp">
-                <span>🕐</span>
-                <span>${formatTimestamp(data.timestamp)}</span>
-            </span>
+        <div class="card-body">
+            <h3 class="card-title">${data.title}</h3>
+             <div class="card-content">
+                <div class="card-detail" style="background:transparent; border:none; padding-left:0; font-weight:500;">
+                    ${data.description}
+                </div>
+                 ${data.date ? `<div class="card-detail"><span>Date : ${formatDate(data.date)}</span></div>` : ''}
+                 ${data.location ? `<div class="card-detail"><span>Lieu : ${data.location}</span></div>` : ''}
+             </div>
         </div>
     `;
 }
