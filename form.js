@@ -5,6 +5,8 @@
 let currentType = 'absent';
 let editMode = false;
 let editIndex = -1;
+let currentAnnouncementId = null; // Track ID for API updates
+let cachedAnnouncements = []; // Store fetched announcements
 
 // Select Announcement Type
 function selectType(type) {
@@ -377,7 +379,7 @@ otherForm?.addEventListener('submit', function (e) {
 // ========================================
 let isSubmitting = false; // Prevent double submission
 
-function saveAnnouncement(announcement) {
+async function saveAnnouncement(announcement) {
   // Prevent double submission
   if (isSubmitting) {
     console.log('⚠️ Soumission en cours, veuillez patienter...');
@@ -386,48 +388,71 @@ function saveAnnouncement(announcement) {
 
   isSubmitting = true;
 
-  const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+  try {
+    if (editMode && editIndex >= 0) {
+      // Update existing announcement
+      // We need the ID from the existing announcement
+      const currentAnnouncements = await window.announcementAPI.getAll();
+      // editindex corresponds to index in sorted array used in loadManageList?
+      // Wait, loadManageList sorts by timestamp. editAnnouncement takes index from that sorted list.
+      // I need to be careful about which ID I am updating.
+      // Better: When entering edit mode, store the ID, not the index.
 
-  if (editMode && editIndex >= 0) {
-    // Update existing announcement
-    announcements[editIndex] = announcement;
-    localStorage.setItem('announcements', JSON.stringify(announcements));
-    alert('✅ Annonce modifiée avec succès!');
+      // But for now, let's assume we have the object in memory or passed to this function.
+      // Actually editAnnouncement sets global inputs.
+      // I should modify editAnnouncement to store the current ID being edited.
 
-    // Exit edit mode
-    exitEditMode();
-  } else {
-    // Add new announcement
-    announcements.push(announcement);
-    localStorage.setItem('announcements', JSON.stringify(announcements));
-    alert('✅ Annonce publiée avec succès!');
+      if (!currentAnnouncementId) {
+        throw new Error("No announcement ID found for update");
+      }
+
+      announcement.id = currentAnnouncementId;
+      await window.announcementAPI.update(announcement);
+      alert('✅ Annonce modifiée avec succès!');
+
+      // Exit edit mode
+      exitEditMode();
+    } else {
+      // Add new announcement
+      await window.announcementAPI.create(announcement);
+      alert('✅ Annonce publiée avec succès!');
+    }
+
+    // Reset form
+    document.querySelector('.announcement-form.active').reset();
+
+    // Reset calculated fields
+    if (currentType === 'absent' && typeof calculatedPeriod !== 'undefined') {
+      if (calculatedPeriod) {
+        calculatedPeriod.textContent = 'Sélectionnez les dates pour calculer la période';
+        calculatedPeriod.style.borderColor = 'var(--primary)';
+        calculatedPeriod.style.color = 'var(--primary)';
+      }
+    } else if (currentType === 'devoir' && typeof calculatedDuration !== 'undefined') {
+      if (calculatedDuration) {
+        calculatedDuration.textContent = 'Sélectionnez les heures pour calculer la durée';
+        calculatedDuration.style.borderColor = 'var(--primary)';
+        calculatedDuration.style.color = 'var(--primary)';
+      }
+    }
+
+    // Reload manage list
+    await loadManageList();
+
+  } catch (error) {
+    console.error('Error saving announcement:', error);
+    alert('❌ Erreur lors de la sauvegarde: ' + error.message);
+  } finally {
+    // Re-enable submission after a short delay
+    setTimeout(() => {
+      isSubmitting = false;
+    }, 500);
   }
-
-  // Reset form
-  document.querySelector('.announcement-form.active').reset();
-
-  // Reset calculated fields
-  if (currentType === 'absent') {
-    calculatedPeriod.textContent = 'Sélectionnez les dates pour calculer la période';
-    calculatedPeriod.style.borderColor = 'var(--primary)';
-    calculatedPeriod.style.color = 'var(--primary)';
-  } else if (currentType === 'devoir') {
-    calculatedDuration.textContent = 'Sélectionnez les heures pour calculer la durée';
-    calculatedDuration.style.borderColor = 'var(--primary)';
-    calculatedDuration.style.color = 'var(--primary)';
-  }
-
-  // Reload manage list
-  loadManageList();
-
-  // Re-enable submission after a short delay
-  setTimeout(() => {
-    isSubmitting = false;
-  }, 500);
 }
 
 function editAnnouncement(index) {
-  const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+  // Use cached announcements from loadManageList
+  const announcements = cachedAnnouncements;
   const announcement = announcements[index];
 
   if (!announcement) return;
@@ -435,9 +460,12 @@ function editAnnouncement(index) {
   // Set edit mode
   editMode = true;
   editIndex = index;
+  currentAnnouncementId = announcement.id; // Store ID for update
 
   // Switch to correct form type
   selectType(announcement.type);
+
+  // ... rest of the function remains similar ... (setting input values)
 
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -528,6 +556,7 @@ function editAnnouncement(index) {
 function exitEditMode() {
   editMode = false;
   editIndex = -1;
+  currentAnnouncementId = null; // Clear ID
 
   // Remove edit banner
   const editBanner = document.getElementById('edit-banner');
@@ -545,96 +574,108 @@ function exitEditMode() {
   }
 
   // Reset calculated fields
-  if (currentType === 'absent' && calculatedPeriod) {
-    calculatedPeriod.textContent = 'Sélectionnez les dates pour calculer la période';
-    calculatedPeriod.style.borderColor = 'var(--primary)';
-    calculatedPeriod.style.color = 'var(--primary)';
-  } else if (currentType === 'devoir' && calculatedDuration) {
-    calculatedDuration.textContent = 'Sélectionnez les heures pour calculer la durée';
-    calculatedDuration.style.borderColor = 'var(--primary)';
-    calculatedDuration.style.color = 'var(--primary)';
+  if (currentType === 'absent' && typeof calculatedPeriod !== 'undefined') {
+    if (calculatedPeriod) {
+      calculatedPeriod.textContent = 'Sélectionnez les dates pour calculer la période';
+      calculatedPeriod.style.borderColor = 'var(--primary)';
+      calculatedPeriod.style.color = 'var(--primary)';
+    }
+  } else if (currentType === 'devoir' && typeof calculatedDuration !== 'undefined') {
+    if (calculatedDuration) {
+      calculatedDuration.textContent = 'Sélectionnez les heures pour calculer la durée';
+      calculatedDuration.style.borderColor = 'var(--primary)';
+      calculatedDuration.style.color = 'var(--primary)';
+    }
   }
 }
 
-function loadManageList() {
+async function loadManageList() {
   const manageList = document.getElementById('manage-list');
-  const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
 
-  if (announcements.length === 0) {
-    manageList.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: var(--text-muted);">
-                <p>Aucune annonce pour le moment</p>
-            </div>
-        `;
-    return;
-  }
+  try {
+    const announcements = await window.announcementAPI.getAll();
+    cachedAnnouncements = announcements; // Store for edit/delete access
 
-  manageList.innerHTML = '';
-
-  // Sort by newest first
-  const sortedAnnouncements = announcements.map((a, index) => ({ ...a, originalIndex: index }));
-  sortedAnnouncements.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-  sortedAnnouncements.forEach((announcement) => {
-    const item = document.createElement('div');
-    item.className = 'manage-item';
-
-    let title = '';
-    let meta = '';
-
-    switch (announcement.type) {
-      case 'absent':
-        title = `${announcement.professeur} - ${announcement.matiere}`;
-        meta = `Absent • ${announcement.period}`;
-        break;
-      case 'devoir':
-        title = `${announcement.devoirType} - ${announcement.matiere}`;
-        meta = `${announcement.class} • Salle ${announcement.salle}`;
-        break;
-      case 'exclusion':
-        title = `${announcement.student} - ${announcement.class}`;
-        meta = `Exclusion ${announcement.exclusionType === 'permanent' ? 'Définitive' : 'Temporaire'} • ${announcement.period}`;
-        break;
-      case 'other':
-        title = announcement.title;
-        meta = announcement.category;
-        break;
+    if (announcements.length === 0) {
+      manageList.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <p>Aucune annonce pour le moment</p>
+                </div>
+            `;
+      return;
     }
 
-    item.innerHTML = `
-            <div class="manage-item-info">
-                <div class="manage-item-title">${title}</div>
-                <div class="manage-item-meta">${meta} • ${formatTimestamp(announcement.timestamp)}</div>
-            </div>
-            <div class="manage-item-actions">
-                <button class="btn-edit" onclick="editAnnouncement(${announcement.originalIndex})">
-                    ✏️ Modifier
-                </button>
-                <button class="btn-delete" onclick="deleteAnnouncement(${announcement.originalIndex})">
-                    🗑️ Supprimer
-                </button>
-            </div>
-        `;
+    manageList.innerHTML = '';
 
-    manageList.appendChild(item);
-  });
+    // API returns sorted by timestamp DESC, so we can use directly
+    // But let's map to add original index for UI if needed, though we should use ID for actions
+
+    announcements.forEach((announcement, index) => {
+      const item = document.createElement('div');
+      item.className = 'manage-item';
+
+      let title = '';
+      let meta = '';
+
+      switch (announcement.type) {
+        case 'absent':
+          title = `${announcement.professeur} - ${announcement.matiere}`;
+          meta = `Absent • ${announcement.period}`;
+          break;
+        case 'devoir':
+          title = `${announcement.devoirType} - ${announcement.matiere}`;
+          meta = `${announcement.class} • Salle ${announcement.salle}`;
+          break;
+        case 'exclusion':
+          title = `${announcement.student} - ${announcement.class}`;
+          meta = `Exclusion ${announcement.exclusionType === 'permanent' ? 'Définitive' : 'Temporaire'} • ${announcement.period}`;
+          break;
+        case 'other':
+          title = announcement.title;
+          meta = announcement.category;
+          break;
+      }
+
+      item.innerHTML = `
+                <div class="manage-item-info">
+                    <div class="manage-item-title">${title}</div>
+                    <div class="manage-item-meta">${meta} • ${formatTimestamp(announcement.timestamp)}</div>
+                </div>
+                <div class="manage-item-actions">
+                    <button class="btn-edit" onclick="editAnnouncement(${index})">
+                        ✏️ Modifier
+                    </button>
+                    <button class="btn-delete" onclick="deleteAnnouncement('${announcement.id}')">
+                        🗑️ Supprimer
+                    </button>
+                </div>
+            `;
+
+      manageList.appendChild(item);
+    });
+  } catch (error) {
+    console.error("Error loading manage list:", error);
+    manageList.innerHTML = `<div style="color:red; padding:20px;">Error loading announcements: ${error.message}</div>`;
+  }
 }
 
-function deleteAnnouncement(index) {
+async function deleteAnnouncement(id) {
   if (!confirm('Êtes-vous sûr de vouloir supprimer cette annonce?')) {
     return;
   }
 
-  const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
-  announcements.splice(index, 1);
-  localStorage.setItem('announcements', JSON.stringify(announcements));
+  try {
+    await window.announcementAPI.delete(id);
+    await loadManageList();
+    alert('✅ Annonce supprimée');
 
-  loadManageList();
-  alert('✅ Annonce supprimée');
-
-  // Exit edit mode if we're editing this announcement
-  if (editMode && editIndex === index) {
-    exitEditMode();
+    // Exit edit mode if we're editing this announcement
+    if (editMode && currentAnnouncementId == id) {
+      exitEditMode();
+    }
+  } catch (error) {
+    console.error("Error deleting announcement:", error);
+    alert('❌ Erreur: ' + error.message);
   }
 }
 

@@ -28,33 +28,54 @@ function updateDateTime() {
 }
 
 // Load and Display Announcements
-function loadAnnouncements() {
+async function loadAnnouncements() {
     const container = document.getElementById('announcements-container');
     const noAnnouncementsDiv = document.getElementById('no-announcements');
 
-    // Get announcements from localStorage
-    const announcements = JSON.parse(localStorage.getItem('announcements')) || [];
+    try {
+        // Get announcements from API
+        const announcements = await window.announcementAPI.getAll();
 
-    // Clear container
-    container.innerHTML = '';
+        // Create data hash for comparison
+        const currentDataStr = JSON.stringify(announcements);
+        const currentHash = currentDataStr.length + '_' + currentDataStr.substring(0, 50);
 
-    if (announcements.length === 0) {
-        container.style.display = 'none';
-        noAnnouncementsDiv.style.display = 'flex';
-        return;
+        // Only update DOM if data changed
+        if (lastDataHash === currentHash) {
+            return;
+        }
+
+        // Clear container
+        container.innerHTML = '';
+
+        if (announcements.length === 0) {
+            container.style.display = 'none';
+            noAnnouncementsDiv.style.display = 'flex';
+            lastDataHash = currentHash;
+            localStorage.setItem('announcements', currentDataStr);
+            return;
+        }
+
+        container.style.display = 'grid';
+        noAnnouncementsDiv.style.display = 'none';
+
+        // Sort announcements by timestamp (newest first)
+        // Note: API already sorts by timestamp DESC, but good to be safe
+        // announcements is already an array from API
+
+        // Display each announcement
+        announcements.forEach((announcement, index) => {
+            const card = createAnnouncementCard(announcement, index);
+            container.appendChild(card);
+        });
+
+        // Update local cache and hash
+        localStorage.setItem('announcements', currentDataStr);
+        lastDataHash = currentHash;
+
+    } catch (error) {
+        console.error('Error loading announcements:', error);
     }
-
-    container.style.display = 'grid';
-    noAnnouncementsDiv.style.display = 'none';
-
-    // Sort announcements by timestamp (newest first)
-    announcements.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-    // Display each announcement
-    announcements.forEach((announcement, index) => {
-        const card = createAnnouncementCard(announcement, index);
-        container.appendChild(card);
-    });
 }
 
 // Create Announcement Card
@@ -295,30 +316,15 @@ document.getElementById('admin-trigger')?.addEventListener('click', function () 
 });
 
 // Track last known data state
+// Track last known data state
 let lastDataHash = '';
-
-function getDataHash() {
-    const data = localStorage.getItem('announcements') || '[]';
-    return data.length + '_' + data.substring(0, 50);
-}
-
-function checkForUpdates() {
-    const currentHash = getDataHash();
-    if (lastDataHash && lastDataHash !== currentHash) {
-        console.log('🔄 Données mises à jour, rechargement...');
-        loadAnnouncements();
-    }
-    lastDataHash = currentHash;
-}
 
 // Initialize
 updateDateTime();
 setInterval(updateDateTime, 1000);
+
+// Initial load
 loadAnnouncements();
-lastDataHash = getDataHash();
 
-// Auto-check for updates every 5 seconds (for remote changes)
-setInterval(checkForUpdates, 5000);
-
-// Also refresh display every 30 seconds as backup
-setInterval(loadAnnouncements, 30000);
+// Poll API for updates every 5 seconds
+setInterval(loadAnnouncements, 5000);
