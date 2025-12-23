@@ -31,21 +31,29 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="content">
-        <div class="announcements-header">
-            <h1>📢 Annonces du Jour</h1>
-        </div>
+    <div class="main-content">
+        <h2 class="section-title">📢 إعلانات اليوم</h2>
 
         <div id="announcements-container" class="announcements-grid">
             <!-- Announcements will be dynamically loaded here -->
         </div>
 
-        <div id="no-announcements" class="no-announcements" style="display: none;">
-            <div class="empty-state">
-                <div class="empty-icon">📭</div>
-                <h2>Aucune annonce pour le moment</h2>
-                <p>Les nouvelles annonces apparaîtront ici automatiquement</p>
+        <div id="no-announcements"
+            style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 50px; text-align: center; color: #64748b;">
+            <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">📭</div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 10px;">لا توجد إعلانات حالياً</h2>
+            <p style="font-size: 1rem; opacity: 0.8;">الإعلانات الجديدة ستظهر هنا تلقائياً</p>
+        </div>
+    </div>
+
+    <!-- FLASH OVERLAY (Popup) -->
+    <div id="flash-overlay" class="flash-overlay">
+        <div class="flash-content">
+            <div class="flash-icon-container">
+                <span class="flash-icon">⚡</span>
             </div>
+            <h1 id="flash-title-display">عنوان الومضة</h1>
+            <p id="flash-message-display">نص الرسالة العاجلة يظهر هنا...</p>
         </div>
     </div>
 

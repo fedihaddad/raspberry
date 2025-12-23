@@ -58,6 +58,10 @@
             <span class="type-icon">📢</span>
             <span class="type-label">إعلان عام</span>
           </button>
+          <button class="type-btn" data-type="flash" onclick="selectType('flash')">
+            <span class="type-icon">⚡</span>
+            <span class="type-label">ومضة (Flash)</span>
+          </button>
         </div>
       </div>
 
@@ -105,6 +109,47 @@
 
         <button type="submit" class="btn-submit">
           <span>✓</span> نشر الإعلان
+        </button>
+      </form>
+
+      <!-- FORM FOR FLASH INFO (NEW) -->
+      <form id="form-flash" class="announcement-form">
+        <h3>⚡ ومضة إخبارية عاجلة (Popup)</h3>
+
+        <div class="info-box">
+          سيظهر هذا الإعلان كنافذة منبثقة تغطي الشاشة لمدة محددة.
+        </div>
+
+        <div class="form-group">
+          <label for="flash-title">العنوان الرئيسي *</label>
+          <input type="text" id="flash-title" placeholder="مثال: تغيير قاعة, تنبيه هام" required>
+        </div>
+
+        <div class="form-group">
+          <label for="flash-message">الرسالة *</label>
+          <textarea id="flash-message" rows="3" placeholder="اكتب الرسالة التي ستظهر بشكل كبير..." required
+            style="font-size: 1.2rem;"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="flash-date">تاريخ الظهور *</label>
+            <input type="date" id="flash-date" required>
+          </div>
+          <div class="form-group">
+            <label for="flash-start">وقت البداية *</label>
+            <input type="time" id="flash-start" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="flash-duration">مدة العرض (بالدقائق) *</label>
+          <input type="number" id="flash-duration" min="1" max="60" value="5" required>
+          <small style="color:#64748b">كم دقيقة سيبقى هذا الإعلان ظاهراً؟</small>
+        </div>
+
+        <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+          <span>⚡</span> تفعيل الومضة
         </button>
       </form>
 

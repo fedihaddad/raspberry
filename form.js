@@ -375,6 +375,33 @@ otherForm?.addEventListener('submit', function (e) {
 });
 
 // ========================================
+// FLASH INFO FORM (NEW)
+// ========================================
+const flashForm = document.getElementById('form-flash');
+
+flashForm?.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const title = document.getElementById('flash-title').value.trim();
+  const message = document.getElementById('flash-message').value.trim();
+  const date = document.getElementById('flash-date').value;
+  const startTime = document.getElementById('flash-start').value;
+  const duration = parseInt(document.getElementById('flash-duration').value);
+
+  const announcement = {
+    type: 'flash',
+    title,
+    message,
+    date,
+    startTime,
+    duration, // minutes
+    timestamp: new Date().toISOString()
+  };
+
+  saveAnnouncement(announcement);
+});
+
+// ========================================
 // SAVE & MANAGE ANNOUNCEMENTS
 // ========================================
 let isSubmitting = false; // Prevent double submission
@@ -382,7 +409,7 @@ let isSubmitting = false; // Prevent double submission
 async function saveAnnouncement(announcement) {
   // Prevent double submission
   if (isSubmitting) {
-    console.log('⚠️ Soumission en cours, veuillez patienter...');
+    console.log('⚠️ يرجى الانتظار، جاري الحفظ...');
     return;
   }
 
@@ -390,32 +417,20 @@ async function saveAnnouncement(announcement) {
 
   try {
     if (editMode && editIndex >= 0) {
-      // Update existing announcement
-      // We need the ID from the existing announcement
-      const currentAnnouncements = await window.announcementAPI.getAll();
-      // editindex corresponds to index in sorted array used in loadManageList?
-      // Wait, loadManageList sorts by timestamp. editAnnouncement takes index from that sorted list.
-      // I need to be careful about which ID I am updating.
-      // Better: When entering edit mode, store the ID, not the index.
-
-      // But for now, let's assume we have the object in memory or passed to this function.
-      // Actually editAnnouncement sets global inputs.
-      // I should modify editAnnouncement to store the current ID being edited.
-
       if (!currentAnnouncementId) {
         throw new Error("No announcement ID found for update");
       }
 
       announcement.id = currentAnnouncementId;
       await window.announcementAPI.update(announcement);
-      alert('✅ Annonce modifiée avec succès!');
+      alert('✅ تم تحديث الإعلان بنجاح!');
 
       // Exit edit mode
       exitEditMode();
     } else {
       // Add new announcement
       await window.announcementAPI.create(announcement);
-      alert('✅ Annonce publiée avec succès!');
+      alert('✅ تم نشر الإعلان بنجاح!');
     }
 
     // Reset form
@@ -424,13 +439,13 @@ async function saveAnnouncement(announcement) {
     // Reset calculated fields
     if (currentType === 'absent' && typeof calculatedPeriod !== 'undefined') {
       if (calculatedPeriod) {
-        calculatedPeriod.textContent = 'Sélectionnez les dates pour calculer la période';
+        calculatedPeriod.textContent = 'اختر التواريخ لحساب المدة';
         calculatedPeriod.style.borderColor = 'var(--primary)';
         calculatedPeriod.style.color = 'var(--primary)';
       }
     } else if (currentType === 'devoir' && typeof calculatedDuration !== 'undefined') {
       if (calculatedDuration) {
-        calculatedDuration.textContent = 'Sélectionnez les heures pour calculer la durée';
+        calculatedDuration.textContent = 'اختر التوقيت لحساب المدة';
         calculatedDuration.style.borderColor = 'var(--primary)';
         calculatedDuration.style.color = 'var(--primary)';
       }
@@ -441,7 +456,7 @@ async function saveAnnouncement(announcement) {
 
   } catch (error) {
     console.error('Error saving announcement:', error);
-    alert('❌ Erreur lors de la sauvegarde: ' + error.message);
+    alert('❌ خطأ في الحفظ: ' + error.message);
   } finally {
     // Re-enable submission after a short delay
     setTimeout(() => {
@@ -465,8 +480,6 @@ function editAnnouncement(index) {
   // Switch to correct form type
   selectType(announcement.type);
 
-  // ... rest of the function remains similar ... (setting input values)
-
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -487,12 +500,13 @@ function editAnnouncement(index) {
       justify-content: space-between;
       align-items: center;
       font-weight: 600;
+      direction: rtl;
     `;
     formContainer.insertBefore(editBanner, formContainer.firstChild);
   }
 
   editBanner.innerHTML = `
-    <span>✏️ Mode Édition - Modification de l'annonce</span>
+    <span>✏️ وضع التعديل - جاري تعديل الإعلان</span>
     <button onclick="exitEditMode()" style="
       background: rgba(255,255,255,0.2);
       border: none;
@@ -501,7 +515,7 @@ function editAnnouncement(index) {
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-    ">Annuler</button>
+    ">إلغاء</button>
   `;
 
   // Pre-fill form based on type
@@ -543,12 +557,18 @@ function editAnnouncement(index) {
       document.getElementById('other-date').value = announcement.date || '';
       document.getElementById('other-time').value = announcement.time || '';
       document.getElementById('other-location').value = announcement.location || '';
+    } else if (announcement.type === 'flash') {
+      document.getElementById('flash-title').value = announcement.title || '';
+      document.getElementById('flash-message').value = announcement.message || '';
+      document.getElementById('flash-date').value = announcement.date || '';
+      document.getElementById('flash-start').value = announcement.startTime || '';
+      document.getElementById('flash-duration').value = announcement.duration || 5;
     }
 
     // Update submit button text
     const submitBtn = document.querySelector('.announcement-form.active .btn-submit');
     if (submitBtn) {
-      submitBtn.innerHTML = '<span>💾</span> Enregistrer les Modifications';
+      submitBtn.innerHTML = '<span>💾</span> حفظ التعديلات';
     }
   }, 100);
 }
@@ -570,19 +590,19 @@ function exitEditMode() {
   // Reset submit button text
   const submitBtn = document.querySelector('.announcement-form.active .btn-submit');
   if (submitBtn) {
-    submitBtn.innerHTML = '<span>✓</span> Publier l\'Annonce';
+    submitBtn.innerHTML = '<span>✓</span> نشر الإعلان';
   }
 
   // Reset calculated fields
   if (currentType === 'absent' && typeof calculatedPeriod !== 'undefined') {
     if (calculatedPeriod) {
-      calculatedPeriod.textContent = 'Sélectionnez les dates pour calculer la période';
+      calculatedPeriod.textContent = 'اختر التواريخ لحساب المدة';
       calculatedPeriod.style.borderColor = 'var(--primary)';
       calculatedPeriod.style.color = 'var(--primary)';
     }
   } else if (currentType === 'devoir' && typeof calculatedDuration !== 'undefined') {
     if (calculatedDuration) {
-      calculatedDuration.textContent = 'Sélectionnez les heures pour calculer la durée';
+      calculatedDuration.textContent = 'اختر التوقيت لحساب المدة';
       calculatedDuration.style.borderColor = 'var(--primary)';
       calculatedDuration.style.color = 'var(--primary)';
     }
@@ -599,16 +619,13 @@ async function loadManageList() {
     if (announcements.length === 0) {
       manageList.innerHTML = `
                 <div style="text-align: center; padding: 40px; color: var(--text-muted);">
-                    <p>Aucune annonce pour le moment</p>
+                    <p>لا توجد إعلانات حالياً</p>
                 </div>
             `;
       return;
     }
 
     manageList.innerHTML = '';
-
-    // API returns sorted by timestamp DESC, so we can use directly
-    // But let's map to add original index for UI if needed, though we should use ID for actions
 
     announcements.forEach((announcement, index) => {
       const item = document.createElement('div');
@@ -620,19 +637,23 @@ async function loadManageList() {
       switch (announcement.type) {
         case 'absent':
           title = `${announcement.professeur} - ${announcement.matiere}`;
-          meta = `Absent • ${announcement.period}`;
+          meta = `غياب • ${announcement.period}`;
           break;
         case 'devoir':
           title = `${announcement.devoirType} - ${announcement.matiere}`;
-          meta = `${announcement.class} • Salle ${announcement.salle}`;
+          meta = `${announcement.class} • قاعة ${announcement.salle}`;
           break;
         case 'exclusion':
           title = `${announcement.student} - ${announcement.class}`;
-          meta = `Exclusion ${announcement.exclusionType === 'permanent' ? 'Définitive' : 'Temporaire'} • ${announcement.period}`;
+          meta = `طرد ${announcement.exclusionType === 'permanent' ? 'نهائي' : 'مؤقت'} • ${announcement.period}`;
           break;
         case 'other':
           title = announcement.title;
           meta = announcement.category;
+          break;
+        case 'flash':
+          title = `⚡ ${announcement.title}`;
+          meta = `ومضة • المدة: ${announcement.duration}د`;
           break;
       }
 
@@ -643,10 +664,10 @@ async function loadManageList() {
                 </div>
                 <div class="manage-item-actions">
                     <button class="btn-edit" onclick="editAnnouncement(${index})">
-                        ✏️ Modifier
+                        ✏️ تعديل
                     </button>
                     <button class="btn-delete" onclick="deleteAnnouncement('${announcement.id}')">
-                        🗑️ Supprimer
+                        🗑️ حذف
                     </button>
                 </div>
             `;
@@ -655,19 +676,19 @@ async function loadManageList() {
     });
   } catch (error) {
     console.error("Error loading manage list:", error);
-    manageList.innerHTML = `<div style="color:red; padding:20px;">Error loading announcements: ${error.message}</div>`;
+    manageList.innerHTML = `<div style="color:red; padding:20px;">خطأ في التحميل: ${error.message}</div>`;
   }
 }
 
 async function deleteAnnouncement(id) {
-  if (!confirm('Êtes-vous sûr de vouloir supprimer cette annonce?')) {
+  if (!confirm('هل أنت متأكد من حذف هذا الإعلان؟')) {
     return;
   }
 
   try {
     await window.announcementAPI.delete(id);
     await loadManageList();
-    alert('✅ Annonce supprimée');
+    alert('✅ تم الحذف');
 
     // Exit edit mode if we're editing this announcement
     if (editMode && currentAnnouncementId == id) {
@@ -675,13 +696,13 @@ async function deleteAnnouncement(id) {
     }
   } catch (error) {
     console.error("Error deleting announcement:", error);
-    alert('❌ Erreur: ' + error.message);
+    alert('❌ خطأ: ' + error.message);
   }
 }
 
 function formatTimestamp(timestamp) {
   const date = new Date(timestamp);
-  return date.toLocaleDateString('fr-FR', {
+  return date.toLocaleDateString('ar-TN', {
     day: 'numeric',
     month: 'short',
     hour: '2-digit',
@@ -708,4 +729,9 @@ if (document.getElementById('devoir-date')) {
 if (document.getElementById('other-date')) {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('other-date').value = today;
+}
+
+if (document.getElementById('flash-date')) {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('flash-date').value = today;
 }

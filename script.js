@@ -34,18 +34,27 @@ async function loadAnnouncements() {
 
     try {
         const announcements = await window.announcementAPI.getAll();
-        const currentDataStr = JSON.stringify(announcements);
+
+        // 1. Separate Standard Announcements from Flash Announcements
+        const standardAnnouncements = announcements.filter(a => a.type !== 'flash');
+        const flashAnnouncements = announcements.filter(a => a.type === 'flash');
+
+        // 2. Handle Flash Announcements (Popup Logic)
+        checkFlash(flashAnnouncements);
+
+        // 3. Handle Standard Announcements (Grid Logic)
+        const currentDataStr = JSON.stringify(standardAnnouncements);
         const currentHash = currentDataStr.length + '_' + currentDataStr.substring(0, 50);
 
         if (lastDataHash === currentHash) return;
 
         container.innerHTML = '';
 
-        if (announcements.length === 0) {
+        if (standardAnnouncements.length === 0) {
             container.style.display = 'none';
             if (noAnnouncementsDiv) {
                 noAnnouncementsDiv.style.display = 'flex';
-                noAnnouncementsDiv.innerHTML = '<h1>لا توجد إعلانات حالياً</h1>';
+                // noAnnouncementsDiv.innerHTML = '<h1>لا توجد إعلانات حالياً</h1>'; // Deja fait en HTML
             }
             lastDataHash = currentHash;
             localStorage.setItem('announcements', currentDataStr);
@@ -55,7 +64,7 @@ async function loadAnnouncements() {
         container.style.display = 'flex'; // Flex column from CSS
         if (noAnnouncementsDiv) noAnnouncementsDiv.style.display = 'none';
 
-        announcements.forEach((announcement, index) => {
+        standardAnnouncements.forEach((announcement, index) => {
             const card = createAnnouncementCard(announcement, index);
             container.appendChild(card);
         });
@@ -65,6 +74,42 @@ async function loadAnnouncements() {
 
     } catch (error) {
         console.error('Error loading announcements:', error);
+    }
+}
+
+// Check if any Flash announcement should be displayed
+function checkFlash(flashAnnouncements) {
+    const overlay = document.getElementById('flash-overlay');
+    const titleEl = document.getElementById('flash-title-display');
+    const messageEl = document.getElementById('flash-message-display');
+
+    if (!overlay || flashAnnouncements.length === 0) {
+        overlay?.classList.remove('active');
+        return;
+    }
+
+    const now = new Date();
+    let activeFlash = null;
+
+    // Find the first active flash announcement
+    for (const flash of flashAnnouncements) {
+        // Flash Date + Start Time
+        const flashStart = new Date(`${flash.date}T${flash.startTime}`);
+        const durationMs = (flash.duration || 5) * 60 * 1000;
+        const flashEnd = new Date(flashStart.getTime() + durationMs);
+
+        if (now >= flashStart && now <= flashEnd) {
+            activeFlash = flash;
+            break; // Show only one at a time (priority to the first found or sorted)
+        }
+    }
+
+    if (activeFlash) {
+        titleEl.textContent = activeFlash.title;
+        messageEl.textContent = activeFlash.message;
+        overlay.classList.add('active');
+    } else {
+        overlay.classList.remove('active');
     }
 }
 
@@ -90,7 +135,7 @@ function createAnnouncementCard(announcement, index) {
 // Create Absent Teacher Card (Arabic)
 function createAbsentCard(data) {
     const icon = '👨‍🏫';
-    const title = `الأستاذ(ة) ${data.professeur}`;
+    const title = `غياب الأستاذ(ة) ${data.professeur}`;
 
     return `
         <div class="card-header">
@@ -147,8 +192,11 @@ function createDevoirCard(data) {
 // Create Exclusion Card (Arabic)
 function createExclusionCard(data) {
     const icon = '🚫';
-    const typeLabel = data.exclusionType === 'permanent' ? 'طرد نهائي' : 'طرد مؤقت';
-    const title = `التلميذ(ة) ${data.student} (${data.class})`;
+    const action = data.exclusionType === 'permanent' ? 'رفت' : 'طرد'; // Verbe (Nom d'action ici plus logique)
+
+    // Phrase spécifique demandée: Verbe/Action + Nom + "المرسم بالقسم" + Classe
+    // Ex: طرد التلميذ فلان المرسم بالقسم 9 أساسي 1
+    const title = `تم ${action} التلميذ(ة) ${data.student} المرسم(ة) بالقسم ${data.class}`;
 
     return `
         <div class="card-header">
@@ -158,11 +206,12 @@ function createExclusionCard(data) {
             <h3 class="card-title">${title}</h3>
             <div class="card-content">
                 <div class="card-detail">
-                    <span>${typeLabel} - السبب: <strong>${data.reason}</strong></span>
+                    <span>السبب: <strong>${data.reason}</strong></span>
                 </div>
                  <div class="card-detail">
                     <span>المدة: <strong>${data.period}</strong></span>
                 </div>
+                ${data.notes ? `<div class="card-detail"><span>${data.notes}</span></div>` : ''}
             </div>
         </div>
     `;

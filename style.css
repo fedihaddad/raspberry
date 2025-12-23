@@ -31,11 +31,12 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 4px solid var(--accent);
+    border-bottom: 4px solid #3b82f6;
+    /* Ligne BLEUE sous la navbar */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .logo-section {
@@ -438,4 +439,108 @@ textarea {
 
 .manage-actions {
     display: flex;
+}
+
+/* FLASH OVERLAY (POPUP) */
+.flash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.4);
+    /* Dark semi-transparent overlay */
+    backdrop-filter: blur(12px);
+    /* STRONG BLUR */
+    display: none;
+    /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    z-index: 900;
+    /* Below Header (1000) but above everything else */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.flash-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.flash-content {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 50px;
+    border-radius: 24px;
+    text-align: center;
+    max-width: 700px;
+    width: 90%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.flash-overlay.active .flash-content {
+    transform: scale(1);
+}
+
+/* Decorative gradient line at top of card */
+.flash-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #f59e0b, #ef4444, #8b5cf6);
+}
+
+.flash-icon-container {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px auto;
+    box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.2);
+    border: 4px solid #fff;
+}
+
+.flash-icon {
+    font-size: 3.5rem;
+    animation: pulse 2s infinite;
+}
+
+#flash-title-display {
+    font-size: 2.5rem;
+    color: #1e293b;
+    margin: 0 0 20px 0;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+#flash-message-display {
+    font-size: 1.5rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+    font-weight: 600;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
