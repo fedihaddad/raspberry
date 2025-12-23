@@ -1,8 +1,9 @@
 // ========================================
-// API CONFIGURATION - SQLite Backend
+// API CONFIGURATION - FastAPI Backend
 // ========================================
 
-const API_ENDPOINT = window.location.origin + '/api.php';
+// Auto-detect endpoint (Works for both localhost:8000 and Raspberry IP)
+const API_ENDPOINT = window.location.origin + '/api/announcements';
 
 // ========================================
 // STORAGE FUNCTIONS - SQLite Backend
