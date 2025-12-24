@@ -402,6 +402,54 @@ flashForm?.addEventListener('submit', function (e) {
 });
 
 // ========================================
+// CONFIG WEEK FORM (NEW)
+// ========================================
+const configForm = document.getElementById('form-config');
+
+configForm?.addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const selectedWeekType = document.querySelector('input[name="current-week-type"]:checked').value; // 'A' or 'B'
+
+  // Calculate Reference Date based on selection
+  // Rules:
+  // If user says "This is Week A", Reference Date = Monday of THIS week. (0 weeks diff = Even = A)
+  // If user says "This is Week B", Reference Date = Monday of LAST week. (1 week diff = Odd = B)
+
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon...
+  const dayIndex = (dayOfWeek + 6) % 7; // Mon=0 .. Sun=6
+
+  const currentMonday = new Date(now);
+  currentMonday.setDate(now.getDate() - dayIndex);
+  currentMonday.setHours(0, 0, 0, 0);
+
+  let referenceDate = new Date(currentMonday);
+
+  if (selectedWeekType === 'B') {
+    // If today is B, then Reference (Start of A) must be 1 week ago
+    referenceDate.setDate(currentMonday.getDate() - 7);
+  }
+
+  // Format YYYY-MM-DD
+  const refString = referenceDate.toLocaleDateString('en-CA'); // YYYY-MM-DD standard
+
+  const announcement = {
+    type: 'config_week',
+    referenceDate: refString,
+    setAt: new Date().toISOString(),
+    weekTypeSet: selectedWeekType // Just for info checking
+  };
+
+  // We should ideally update the EXISTING config if it exists to avoid spamming the DB
+  // But for now, append is fine, we query the latest.
+  // Actually, let's try to be clean: delete old configs first?
+  // Nah, simple is robust. createAnnouncement works.
+
+  await saveAnnouncement(announcement);
+});
+
+// ========================================
 // SAVE & MANAGE ANNOUNCEMENTS
 // ========================================
 let isSubmitting = false; // Prevent double submission
@@ -707,6 +755,95 @@ function formatTimestamp(timestamp) {
     month: 'short',
     hour: '2-digit',
     minute: '2-digit'
+  });
+}
+
+
+// ========================================
+// TEMPLATES LOGIC
+// ========================================
+
+const flashData = {
+  silence: {
+    title: "صمت !",
+    message: "فروض في القاعات المجاورة. يرجى التزام الهدوء التام."
+  },
+  phones: {
+    title: "ممنوع الهاتف",
+    message: "يمنع منعاً باتاً استعمال الهاتف الجوال داخل فضاء المعهد."
+  },
+  meeting: {
+    title: "اجتماع طارئ",
+    message: "اجتماع طارئ للأساتذة بقاعة الأساتذة الآن."
+  },
+  welcome: {
+    title: "مرحباً",
+    message: "مرحباً بضيوفنا الكرام في رحاب مؤسستنا."
+  }
+};
+
+const otherData = {
+  timing: {
+    title: "تغيير توقيت",
+    message: "نعلم كافة التلاميذ والأساتذة أن توقيت الحصص سيتغير يوم ... ليصبح ...",
+    category: "urgent"
+  },
+  lost: {
+    title: "ضياع",
+    message: "ضاع شيء (مفاتيح / محفظة) في .... الرجاء ممن وجده تسليمه للإدارة.",
+    category: "info"
+  },
+  parents: {
+    title: "اجتماع الأولياء",
+    message: "ندعو الأولياء الكرام لحضور اجتماع هام يوم ... على الساعة ...",
+    category: "event"
+  },
+  holiday: {
+    title: "عطلة مدرسية",
+    message: "تنطلق عطلة ... يوم ... وتتواصل إلى غاية ...",
+    category: "holiday"
+  },
+  exams: {
+    title: "مناظرة بيضاء",
+    message: "تنطلق الامتحانات التجريبية (المناظرة البيضاء) أيام ... . بالتوفيق للجميع.",
+    category: "urgent"
+  },
+  congrats: {
+    title: "تهنئة",
+    message: "تهنئ الإدارة التلميذ ... من قسم ... لحصوله على ...",
+    category: "activity"
+  },
+  wisdom: {
+    title: "حكمة الأسبوع",
+    message: "من جدّ وجد ومن زرع حصد.",
+    category: "info"
+  }
+};
+
+const flashSelect = document.getElementById('flash-template');
+const otherSelect = document.getElementById('other-template');
+
+if (flashSelect) {
+  flashSelect.addEventListener('change', function () {
+    const val = this.value;
+    if (flashData[val]) {
+      document.getElementById('flash-title').value = flashData[val].title;
+      document.getElementById('flash-message').value = flashData[val].message;
+    }
+  });
+}
+
+if (otherSelect) {
+  otherSelect.addEventListener('change', function () {
+    const val = this.value;
+    if (otherData[val]) {
+      document.getElementById('other-title').value = otherData[val].title;
+      document.getElementById('other-description').value = otherData[val].message;
+      if (otherData[val].category) {
+        const catSelect = document.getElementById('other-category');
+        if (catSelect) catSelect.value = otherData[val].category;
+      }
+    }
   });
 }
 

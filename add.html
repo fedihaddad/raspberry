@@ -62,8 +62,46 @@
             <span class="type-icon">⚡</span>
             <span class="type-label">ومضة (Flash)</span>
           </button>
+          <button class="type-btn" data-type="config" onclick="selectType('config')"
+            style="background: #e2e8f0; color: #475569;">
+            <span class="type-icon">⚙️</span>
+            <span class="type-label">إعدادات الأسبوع</span>
+          </button>
         </div>
       </div>
+
+      <!-- FORM FOR CONFIG WEEK (NEW) -->
+      <form id="form-config" class="announcement-form">
+        <h3>⚙️ إعدادات أسبوع الدراسة (Semaine A / B)</h3>
+
+        <div class="info-box">
+          حدد نوع الأسبوع الحالي (A أو B). سيقوم النظام بالتحديث تلقائياً كل أسبوع بناءً على هذا الإعداد.
+        </div>
+
+        <div class="form-group">
+          <label>الأسبوع الحالي هو:</label>
+          <div class="week-selector">
+            <label class="radio-card">
+              <input type="radio" name="current-week-type" value="A" checked>
+              <div class="radio-content">
+                <span class="radio-icon">🅰️</span>
+                <span>أسبوع (أ) - Semaine A</span>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="current-week-type" value="B">
+              <div class="radio-content">
+                <span class="radio-icon">🅱️</span>
+                <span>أسبوع (ب) - Semaine B</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" style="background: #475569;">
+          <span>💾</span> حفظ الإعدادات
+        </button>
+      </form>
 
       <!-- FORM FOR PROFESSEUR ABSENT -->
       <form id="form-absent" class="announcement-form active">
@@ -118,6 +156,19 @@
 
         <div class="info-box">
           سيظهر هذا الإعلان كنافذة منبثقة تغطي الشاشة لمدة محددة.
+        </div>
+
+        <!-- FLash TEMPLATES -->
+        <div class="form-group"
+          style="background: #f0fdf4; padding: 10px; border-radius: 8px; border: 1px dashed #22c55e;">
+          <label for="flash-template" style="color: #15803d;">✨ نماذج جاهزة</label>
+          <select id="flash-template" style="border-color: #86efac;">
+            <option value="">-- اختر نموذجاً --</option>
+            <option value="silence">🤫 صمت ! فروض</option>
+            <option value="phones">📵 ممنوع الهاتف</option>
+            <option value="meeting">meeting اجتماع طارئ</option>
+            <option value="welcome">👋 ترحيب بالضيوف</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -275,7 +326,23 @@
 
       <!-- FORM FOR OTHER ANNOUNCEMENTS -->
       <form id="form-other" class="announcement-form">
-        <h3>إعلان عام / إداري</h3>
+        <h3>📢 إعلان عام / متنوع</h3>
+
+        <!-- OTHER TEMPLATES -->
+        <div class="form-group"
+          style="background: #eff6ff; padding: 10px; border-radius: 8px; border: 1px dashed #3b82f6;">
+          <label for="other-template" style="color: #1e40af;">✨ نماذج جاهزة</label>
+          <select id="other-template" style="border-color: #93c5fd;">
+            <option value="">-- اختر نموذجاً --</option>
+            <option value="timing">⏰ تغيير توقيت</option>
+            <option value="lost">🔑 ضياع شيء</option>
+            <option value="parents">👨‍👩‍👧‍👦 اجتماع الأولياء</option>
+            <option value="holiday">🏖️ عطلة مدرسية</option>
+            <option value="exams">📝 مناظرة / امتحانات</option>
+            <option value="congrats">🏆 تهنئة (تلميذ نجيب)</option>
+            <option value="wisdom">💡 حكمة الأسبوع</option>
+          </select>
+        </div>
 
         <div class="form-group">
           <label for="other-title">عنوان الإعلان *</label>

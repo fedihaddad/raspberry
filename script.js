@@ -2,6 +2,8 @@
 // DISPLAY SCREEN SCRIPT (index.html)
 // ========================================
 
+let globalReferenceDate = '2024-09-02'; // Default fallback Reference Date (Start of Week A)
+
 // Update Date and Time
 function updateDateTime() {
     const now = new Date();
@@ -20,11 +22,59 @@ function updateDateTime() {
         day: 'numeric'
     };
 
-    const time = now.toLocaleTimeString('fr-FR', timeOptions); // Heure reste format 24h
-    const date = now.toLocaleDateString('ar-TN', dateOptions); // Date en Arabe
+    const time = now.toLocaleTimeString('fr-FR', timeOptions);
+    const date = now.toLocaleDateString('ar-TN', dateOptions);
 
     document.getElementById('time').textContent = time;
     document.getElementById('date').textContent = date;
+
+    // Update Week Info daily (checking every second is cheap enough)
+    if (now.getSeconds() === 0) {
+        updateWeekInfo();
+    }
+}
+
+// Calculate and Update Week A/B Info
+function updateWeekInfo() {
+    const weekBanner = document.getElementById('week-text');
+    if (!weekBanner) return;
+
+    // Use dynamic reference date from Config
+    // Format YYYY-MM-DD ensures correct parsing
+    const referenceDate = new Date(globalReferenceDate + 'T00:00:00');
+
+    const now = new Date();
+    // Reset hours to avoid timezone issues
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const ref = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+
+    // Calculate difference in weeks
+    const diffTime = today - ref;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    // If diffDays is negative (before start), handle gracefully
+    const weeksPassed = Math.floor(diffDays / 7);
+
+    // Logic: Even weeks from reference = A, Odd = B
+    // 0 weeks (first week) -> Even -> A
+    // 1 week -> Odd -> B
+    const isWeekA = (Math.abs(weeksPassed) % 2 === 0);
+    const weekLetter = isWeekA ? 'أ (A)' : 'ب (B)';
+
+    // Get start (Monday) and end (Saturday) of current week
+    const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon...
+    const dayIndex = (dayOfWeek + 6) % 7; // Mon=0 .. Sun=6
+
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - dayIndex);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 5); // Saturday
+
+    const formatDateLong = (d) => d.toLocaleDateString('ar-TN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+
+    weekBanner.textContent = `الأسبوع ${weekLetter} - من ${formatDateLong(startOfWeek)} إلى ${formatDateLong(endOfWeek)}`;
 }
 
 // Load and Display Announcements
@@ -35,14 +85,30 @@ async function loadAnnouncements() {
     try {
         const announcements = await window.announcementAPI.getAll();
 
-        // 1. Separate Standard Announcements from Flash Announcements
-        const standardAnnouncements = announcements.filter(a => a.type !== 'flash');
+        // 0. Extract Configuration (Find latest config_week)
+        // API returns timestamp DESC, so first 'config_week' is the latest.
+        const configItems = announcements.filter(a => a.type === 'config_week');
+        if (configItems.length > 0) {
+            const latestConfig = configItems[0];
+            if (latestConfig.referenceDate) {
+                // Only update if changed to verify logs
+                if (globalReferenceDate !== latestConfig.referenceDate) {
+                    console.log('Update Week Reference:', latestConfig.referenceDate);
+                    globalReferenceDate = latestConfig.referenceDate;
+                    updateWeekInfo(); // Refresh immediately
+                }
+            }
+        }
+
+        // 1. Separate & Filter Announcements
+        // Filter out CONFIG items and Flash items for the main grid
+        const standardAnnouncements = announcements.filter(a => a.type !== 'flash' && a.type !== 'config_week');
         const flashAnnouncements = announcements.filter(a => a.type === 'flash');
 
-        // 2. Handle Flash Announcements (Popup Logic)
+        // 2. Handle Flash Announcements
         checkFlash(flashAnnouncements);
 
-        // 3. Handle Standard Announcements (Grid Logic)
+        // 3. Handle Standard Announcements
         const currentDataStr = JSON.stringify(standardAnnouncements);
         const currentHash = currentDataStr.length + '_' + currentDataStr.substring(0, 50);
 
@@ -54,14 +120,13 @@ async function loadAnnouncements() {
             container.style.display = 'none';
             if (noAnnouncementsDiv) {
                 noAnnouncementsDiv.style.display = 'flex';
-                // noAnnouncementsDiv.innerHTML = '<h1>لا توجد إعلانات حالياً</h1>'; // Deja fait en HTML
             }
             lastDataHash = currentHash;
             localStorage.setItem('announcements', currentDataStr);
             return;
         }
 
-        container.style.display = 'flex'; // Flex column from CSS
+        container.style.display = 'flex';
         if (noAnnouncementsDiv) noAnnouncementsDiv.style.display = 'none';
 
         standardAnnouncements.forEach((announcement, index) => {
@@ -85,61 +150,70 @@ function checkFlash(flashAnnouncements) {
 
     if (!overlay) return;
 
-    // DEBUG LOGS
-    console.log('--- Checking Flash ---');
-    console.log('Total Flash Announcements:', flashAnnouncements.length);
+    // TEST MODE: Force display if URL contains ?testflash=1
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('testflash')) {
+        titleEl.textContent = "تجميد ومضة (Test Mode)";
+        messageEl.textContent = "هذه رسالة اختبار تظهر لأنك استخدمت ?testflash=1";
+        if (!overlay.classList.contains('active')) {
+            overlay.style.display = 'flex';
+            void overlay.offsetWidth;
+            overlay.classList.add('active');
+        }
+        return;
+    }
 
-    if (flashAnnouncements.length === 0) {
-        overlay.classList.remove('active');
+    if (!flashAnnouncements || flashAnnouncements.length === 0) {
+        if (overlay.classList.contains('active')) {
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                if (!overlay.classList.contains('active')) overlay.style.display = 'none';
+            }, 500);
+        }
         return;
     }
 
     const now = new Date();
     let activeFlash = null;
 
-    // Find the first active flash announcement
     for (const flash of flashAnnouncements) {
-        // Flash Date + Start Time
-        // Ensure robust date parsing
-        const datePart = flash.date; // YYYY-MM-DD
-        const timePart = flash.startTime; // HH:MM
+        if (!flash.date || !flash.startTime) continue;
 
-        if (!datePart || !timePart) {
-            console.warn('Skipping flash with missing date/time:', flash);
-            continue;
-        }
+        try {
+            const [year, month, day] = flash.date.split('-').map(Number);
+            const [hours, minutes] = flash.startTime.split(':').map(Number);
 
-        const flashStart = new Date(`${datePart}T${timePart}:00`);
-        const durationMs = (parseInt(flash.duration || 5)) * 60 * 1000;
-        const flashEnd = new Date(flashStart.getTime() + durationMs);
+            const flashStart = new Date(year, month - 1, day, hours, minutes, 0);
+            const durationMin = parseInt(flash.duration || 5);
+            const flashEnd = new Date(flashStart.getTime() + durationMin * 60000);
 
-        console.log(`Flash: "${flash.title}" | Start: ${flashStart.toLocaleTimeString()} | End: ${flashEnd.toLocaleTimeString()} | Now: ${now.toLocaleTimeString()}`);
-
-        if (now >= flashStart && now <= flashEnd) {
-            activeFlash = flash;
-            console.log('>>> ACTIVE FLASH FOUND! <<<');
-            break;
-        } else {
-            console.log('--- Not currently active');
+            if (now >= flashStart && now <= flashEnd) {
+                activeFlash = flash;
+                break;
+            }
+        } catch (e) {
+            console.error("Error parsing flash date:", e, flash);
         }
     }
 
     if (activeFlash) {
         titleEl.textContent = activeFlash.title;
         messageEl.textContent = activeFlash.message;
-        overlay.style.display = 'flex'; // Force display flex before adding active class
-        // Small timeout to allow transition
-        setTimeout(() => {
+
+        if (!overlay.classList.contains('active')) {
+            overlay.style.display = 'flex';
+            void overlay.offsetWidth; // Force Reflow
             overlay.classList.add('active');
-        }, 10);
+        }
     } else {
-        overlay.classList.remove('active');
-        // Hide completely after transition
-        setTimeout(() => {
-            if (!overlay.classList.contains('active')) {
-                overlay.style.display = 'none';
-            }
-        }, 500);
+        if (overlay.classList.contains('active')) {
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                if (!overlay.classList.contains('active')) {
+                    overlay.style.display = 'none';
+                }
+            }, 500);
+        }
     }
 }
 
@@ -165,6 +239,7 @@ function createAnnouncementCard(announcement, index) {
 // Create Absent Teacher Card (Arabic)
 function createAbsentCard(data) {
     const icon = '👨‍🏫';
+    // 'غياب' prefix added in previous step
     const title = `غياب الأستاذ(ة) ${data.professeur}`;
 
     return `
@@ -200,8 +275,8 @@ function createDevoirCard(data) {
             <span class="card-icon">${icon}</span>
         </div>
         <div class="card-body">
-             <h3 class="card-title">${title}</h3>
-             <div class="card-content">
+            <h3 class="card-title">${title}</h3>
+            <div class="card-content">
                 <div class="card-detail">
                     <span>القسم: <strong>${data.class}</strong></span>
                 </div>
@@ -222,10 +297,8 @@ function createDevoirCard(data) {
 // Create Exclusion Card (Arabic)
 function createExclusionCard(data) {
     const icon = '🚫';
-    const action = data.exclusionType === 'permanent' ? 'رفت' : 'طرد'; // Verbe (Nom d'action ici plus logique)
+    const action = data.exclusionType === 'permanent' ? 'رفت' : 'طرد';
 
-    // Phrase spécifique demandée: Verbe/Action + Nom + "المرسم بالقسم" + Classe
-    // Ex: طرد التلميذ فلان المرسم بالقسم 9 أساسي 1
     const title = `تم ${action} التلميذ(ة) ${data.student} المرسم(ة) بالقسم ${data.class}`;
 
     return `
@@ -239,6 +312,7 @@ function createExclusionCard(data) {
                     <span>السبب: <strong>${data.reason}</strong></span>
                 </div>
                  <div class="card-detail">
+                    // Fix 'Définitive' legacy data on the fly
                     <span>المدة: <strong>${data.period === 'Définitive' ? 'نهائي' : data.period}</strong></span>
                 </div>
                 ${data.notes ? `<div class="card-detail"><span>${data.notes}</span></div>` : ''}
@@ -270,7 +344,7 @@ function createOtherCard(data) {
 }
 
 function formatTimestamp(timestamp) {
-    return ""; // Hidden in new design
+    return "";
 }
 
 // Format Date Arabic
@@ -294,7 +368,7 @@ document.getElementById('admin-trigger')?.addEventListener('click', function () 
     if (clickTimer) clearTimeout(clickTimer);
 
     if (clickCount === 3) {
-        window.location.href = 'add.html';
+        window.location.href = 'login.html'; // Redirect to login, not add directly for security
         clickCount = 0;
     }
 
@@ -303,7 +377,6 @@ document.getElementById('admin-trigger')?.addEventListener('click', function () 
     }, 1000);
 });
 
-// Track last known data state
 // Track last known data state
 let lastDataHash = '';
 
