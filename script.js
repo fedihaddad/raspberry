@@ -77,6 +77,41 @@ function updateWeekInfo() {
     weekBanner.textContent = `الأسبوع ${weekLetter} - من ${formatDateLong(startOfWeek)} إلى ${formatDateLong(endOfWeek)}`;
 }
 
+// Check if announcement should still be displayed based on date
+function isAnnouncementValid(announcement) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Reset to start of day for comparison
+
+    // For teacher absences, check if the end date has passed
+    if (announcement.type === 'absent') {
+        if (announcement.endDate) {
+            const endDate = new Date(announcement.endDate);
+            endDate.setHours(23, 59, 59, 999); // End of day
+            if (now > endDate) {
+                return false; // End date has passed
+            }
+        }
+        // If it's a definitive absence (نهائي), always show it
+        if (announcement.period === 'نهائي' || announcement.period === 'Définitive') {
+            return true;
+        }
+    }
+
+    // For devoirs/exams, check if the date has passed
+    if (announcement.type === 'devoir') {
+        if (announcement.date) {
+            const devoirDate = new Date(announcement.date);
+            devoirDate.setHours(23, 59, 59, 999); // End of day
+            if (now > devoirDate) {
+                return false; // Exam date has passed
+            }
+        }
+    }
+
+    // All other announcements are valid
+    return true;
+}
+
 // Load and Display Announcements
 async function loadAnnouncements() {
     const container = document.getElementById('announcements-container');
@@ -102,7 +137,10 @@ async function loadAnnouncements() {
 
         // 1. Separate & Filter Announcements
         // Filter out CONFIG items and Flash items for the main grid
-        const standardAnnouncements = announcements.filter(a => a.type !== 'flash' && a.type !== 'config_week');
+        // Also filter out past/expired announcements
+        const standardAnnouncements = announcements
+            .filter(a => a.type !== 'flash' && a.type !== 'config_week')
+            .filter(a => isAnnouncementValid(a));
         const flashAnnouncements = announcements.filter(a => a.type === 'flash');
 
         // 2. Handle Flash Announcements
@@ -312,7 +350,6 @@ function createExclusionCard(data) {
                     <span>السبب: <strong>${data.reason}</strong></span>
                 </div>
                  <div class="card-detail">
-                    // Fix 'Définitive' legacy data on the fly
                     <span>المدة: <strong>${data.period === 'Définitive' ? 'نهائي' : data.period}</strong></span>
                 </div>
                 ${data.notes ? `<div class="card-detail"><span>${data.notes}</span></div>` : ''}
