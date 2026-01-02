@@ -39,13 +39,13 @@ function calculatePeriod() {
   const endDate = new Date(endDateInput.value);
 
   if (!startDateInput.value || !endDateInput.value) {
-    calculatedPeriod.textContent = 'Sélectionnez les dates pour calculer la période';
+    calculatedPeriod.textContent = 'اختر التواريخ لحساب المدة';
     calculatedPeriod.style.borderColor = 'var(--primary)';
     return;
   }
 
   if (endDate < startDate) {
-    calculatedPeriod.textContent = '⚠️ La date de fin doit être après la date de début';
+    calculatedPeriod.textContent = '⚠️ تاريخ النهاية يجب أن يكون بعد تاريخ البداية';
     calculatedPeriod.style.borderColor = 'var(--danger)';
     calculatedPeriod.style.color = 'var(--danger)';
     return;
@@ -54,14 +54,14 @@ function calculatePeriod() {
   const diffTime = Math.abs(endDate - startDate);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
 
-  const startFormatted = startDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-  const endFormatted = endDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const startFormatted = startDate.toLocaleDateString('ar-TN', { day: 'numeric', month: 'long' });
+  const endFormatted = endDate.toLocaleDateString('ar-TN', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  let periodText = `Du ${startFormatted} au ${endFormatted}`;
+  let periodText = `من ${startFormatted} إلى ${endFormatted}`;
   if (diffDays === 1) {
-    periodText += ` (1 jour)`;
+    periodText += ` (يوم واحد)`;
   } else {
-    periodText += ` (${diffDays} jours)`;
+    periodText += ` (${diffDays} يوم)`;
   }
 
   calculatedPeriod.textContent = `✓ ${periodText}`;
@@ -92,14 +92,14 @@ absentForm?.addEventListener('submit', function (e) {
   const diffTime = Math.abs(endDate - startDate);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-  const startFormatted = startDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-  const endFormatted = endDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const startFormatted = startDate.toLocaleDateString('ar-TN', { day: 'numeric', month: 'long' });
+  const endFormatted = endDate.toLocaleDateString('ar-TN', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  let period = `Du ${startFormatted} au ${endFormatted}`;
+  let period = `من ${startFormatted} إلى ${endFormatted}`;
   if (diffDays === 1) {
-    period += ` (1 jour)`;
+    period += ` (يوم واحد)`;
   } else {
-    period += ` (${diffDays} jours)`;
+    period += ` (${diffDays} يوم)`;
   }
 
   const announcement = {
@@ -269,14 +269,14 @@ function calculateExclusionPeriod() {
   const diffTime = Math.abs(endDate - startDate);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-  const startFormatted = startDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-  const endFormatted = endDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const startFormatted = startDate.toLocaleDateString('ar-TN', { day: 'numeric', month: 'long' });
+  const endFormatted = endDate.toLocaleDateString('ar-TN', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  let periodText = `Du ${startFormatted} au ${endFormatted}`;
+  let periodText = `من ${startFormatted} إلى ${endFormatted}`;
   if (diffDays === 1) {
-    periodText += ` (1 jour)`;
+    periodText += ` (يوم واحد)`;
   } else {
-    periodText += ` (${diffDays} jours)`;
+    periodText += ` (${diffDays} يوم)`;
   }
 
   calculatedExclusionPeriod.textContent = `✓ ${periodText}`;
@@ -316,14 +316,14 @@ exclusionForm?.addEventListener('submit', function (e) {
     const diffTime = Math.abs(end - start);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-    const startFormatted = start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-    const endFormatted = end.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    const startFormatted = start.toLocaleDateString('ar-TN', { day: 'numeric', month: 'long' });
+    const endFormatted = end.toLocaleDateString('ar-TN', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    period = `Du ${startFormatted} au ${endFormatted}`;
+    period = `من ${startFormatted} إلى ${endFormatted}`;
     if (diffDays === 1) {
-      period += ` (1 jour)`;
+      period += ` (يوم واحد)`;
     } else {
-      period += ` (${diffDays} jours)`;
+      period += ` (${diffDays} يوم)`;
     }
   } else {
     period = 'نهائي'; // Changed from 'Définitive' to Arabic
