@@ -184,7 +184,7 @@ async function loadAnnouncements() {
 function checkFlash(flashAnnouncements) {
     const overlay = document.getElementById('flash-overlay');
     const titleEl = document.getElementById('flash-title-display');
-    const messageEl = document.getElementById('flash-message-display');
+    const dateEl = document.getElementById('flash-date-display');
 
     if (!overlay) return;
 
@@ -192,7 +192,13 @@ function checkFlash(flashAnnouncements) {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('testflash')) {
         titleEl.textContent = "تجميد ومضة (Test Mode)";
-        messageEl.textContent = "هذه رسالة اختبار تظهر لأنك استخدمت ?testflash=1";
+        const testDate = new Date();
+        dateEl.textContent = testDate.toLocaleDateString('ar-TN', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
         if (!overlay.classList.contains('active')) {
             overlay.style.display = 'flex';
             void overlay.offsetWidth;
@@ -236,7 +242,19 @@ function checkFlash(flashAnnouncements) {
 
     if (activeFlash) {
         titleEl.textContent = activeFlash.title;
-        messageEl.textContent = activeFlash.message;
+        
+        // Format and display the date
+        if (activeFlash.date) {
+            const flashDate = new Date(activeFlash.date);
+            dateEl.textContent = flashDate.toLocaleDateString('ar-TN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        } else {
+            dateEl.textContent = '';
+        }
 
         if (!overlay.classList.contains('active')) {
             overlay.style.display = 'flex';
